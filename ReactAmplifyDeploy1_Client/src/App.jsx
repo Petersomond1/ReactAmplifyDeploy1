@@ -11,21 +11,21 @@ function App() {
 
   // Fetch display content
   const { data: displayContent } = useQuery(['display'], () =>
-    axios.get('/api/display', {
+    axios.get(`${process.env.REACT_APP_API_URL}/api/display`, {
       headers: { Authorization: authToken }
     }).then(res => res.data)
   );
 
   // Fetch messages
   const { data: messages } = useQuery(['messages'], () =>
-    axios.get('/api/messages', {
+    axios.get(`${process.env.REACT_APP_API_URL}/api/messages`, {
       headers: { Authorization: authToken }
     }).then(res => res.data)
   );
 
   // Post message
   const sendMessage = useMutation(message => 
-    axios.post('/api/messages', { message }, {
+    axios.post(`${process.env.REACT_APP_API_URL}/api/messages`, { message }, {
       headers: { Authorization: authToken }
     }),
     {
@@ -37,7 +37,7 @@ function App() {
   );
 
   const uploadContent = useMutation(content =>
-    axios.post('/api/upload', content, {
+    axios.post(`${process.env.REACT_APP_API_URL}/api/upload`, content, {
       headers: { Authorization: authToken }
     }),
     {
@@ -49,13 +49,13 @@ function App() {
   );
 
   const handleLogin = async (email, password) => {
-    const res = await axios.post('/api/login', { email, password });
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/login`, { email, password });
     localStorage.setItem('token', res.data.token);
     setAuthToken(res.data.token);
   };
 
   const handleRegister = async (email, password) => {
-    await axios.post('/api/register', { email, password });
+    await axios.post(`${process.env.REACT_APP_API_URL}/api/register`, { email, password });
     alert('Registration successful!');
   };
 
