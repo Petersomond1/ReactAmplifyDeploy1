@@ -1,35 +1,80 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [formContent, setFormContent] = useState('');
+  const [displayContent, setDisplayContent] = useState(null);
+
+  useEffect(() => {
+    // Fetch initial data from the backend
+    fetch('/api/display')
+      .then(response => response.json())
+      .then(data => setDisplayContent(data));
+    
+    fetch('/api/messages')
+      .then(response => response.json())
+      .then(data => setMessages(data));
+  }, []);
+
+  const handleSendMessage = () => {
+    fetch('/api/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: newMessage })
+    })
+    .then(response => response.json())
+    .then(data => setMessages([...messages, data]));
+
+    setNewMessage('');
+  };
+
+  const handleSubmitForm = () => {
+    fetch('/api/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: formContent })
+    })
+    .then(response => response.json())
+    .then(data => console.log(data));
+
+    setFormContent('');
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="App">
+      <div className="display-section">
+        {displayContent && (
+          displayContent.type === 'image' ? (
+            <img src={displayContent.url} alt="Display" />
+          ) : (
+            <video src={displayContent.url} controls />
+          )
+        )}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+      <div className="chat-section">
+        <div className="messages">
+          {messages.map((msg, index) => (
+            <div key={index} className="message">{msg.content}</div>
+          ))}
+        </div>
+        <input
+          type="text"
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+        />
+        <button onClick={handleSendMessage}>Send</button>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+      <div className="form-section">
+        <textarea
+          value={formContent}
+          onChange={(e) => setFormContent(e.target.value)}
+        />
+        <button onClick={handleSubmitForm}>Submit</button>
+      </div>
+    </div>
+  );
 }
 
-export default App
+export default App;
