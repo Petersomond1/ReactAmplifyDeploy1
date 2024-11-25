@@ -1,78 +1,104 @@
-import { useState, useEffect } from 'react';
-import './App.css';
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 
 function App() {
-  const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [formContent, setFormContent] = useState('');
-  const [displayContent, setDisplayContent] = useState(null);
+  const [newContent, setNewContent] = useState('');
+  const [authToken, setAuthToken] = useState(localStorage.getItem('token'));
 
-  useEffect(() => {
-    // Fetch initial data from the backend
-    fetch('/api/display')
-      .then(response => response.json())
-      .then(data => setDisplayContent(data));
-    
-    fetch('/api/messages')
-      .then(response => response.json())
-      .then(data => setMessages(data));
-  }, []);
+  const queryClient = useQueryClient();
 
-  const handleSendMessage = () => {
-    fetch('/api/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: newMessage })
-    })
-    .then(response => response.json())
-    .then(data => setMessages([...messages, data]));
+  // Fetch display content
+  const { data: displayContent } = useQuery(['display'], () =>
+    axios.get('/api/display', {
+      headers: { Authorization: authToken }
+    }).then(res => res.data)
+  );
 
-    setNewMessage('');
+  // Fetch messages
+  const { data: messages } = useQuery(['messages'], () =>
+    axios.get('/api/messages', {
+      headers: { Authorization: authToken }
+    }).then(res => res.data)
+  );
+
+  // Post message
+  const sendMessage = useMutation(message => 
+    axios.post('/api/messages', { message }, {
+      headers: { Authorization: authToken }
+    }),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['messages']);
+        setNewMessage('');
+      }
+    }
+  );
+
+  const uploadContent = useMutation(content =>
+    axios.post('/api/upload', content, {
+      headers: { Authorization: authToken }
+    }),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['display']);
+        setNewContent('');
+      }
+    }
+  );
+
+  const handleLogin = async (email, password) => {
+    const res = await axios.post('/api/login', { email, password });
+    localStorage.setItem('token', res.data.token);
+    setAuthToken(res.data.token);
   };
 
-  const handleSubmitForm = () => {
-    fetch('/api/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: formContent })
-    })
-    .then(response => response.json())
-    .then(data => console.log(data));
-
-    setFormContent('');
+  const handleRegister = async (email, password) => {
+    await axios.post('/api/register', { email, password });
+    alert('Registration successful!');
   };
 
   return (
     <div className="App">
-      <div className="display-section">
-        {displayContent && (
-          displayContent.type === 'image' ? (
-            <img src={displayContent.url} alt="Display" />
-          ) : (
-            <video src={displayContent.url} controls />
-          )
-        )}
-      </div>
-      <div className="chat-section">
-        <div className="messages">
-          {messages.map((msg, index) => (
-            <div key={index} className="message">{msg.content}</div>
-          ))}
+      {!authToken ? (
+        <div>
+          <button onClick={() => handleLogin('test@example.com', 'password123')}>Login</button>
+          <button onClick={() => handleRegister('newuser@example.com', 'password123')}>Register</button>
         </div>
-        <input
-          type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-        />
-        <button onClick={handleSendMessage}>Send</button>
-      </div>
-      <div className="form-section">
-        <textarea
-          value={formContent}
-          onChange={(e) => setFormContent(e.target.value)}
-        />
-        <button onClick={handleSubmitForm}>Submit</button>
-      </div>
+      ) : (
+        <>
+          <div className="display-section">
+            {displayContent && (
+              displayContent.type === 'image' ? (
+                <img src={displayContent.url} alt="Display" />
+              ) : (
+                <video src={displayContent.url} controls />
+              )
+            )}
+          </div>
+          <div className="chat-section">
+            <div className="messages">
+              {messages && messages.map((msg) => (
+                <div key={msg.id} className="message">{msg.content}</div>
+              ))}
+            </div>
+            <input
+              type="text"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+            />
+            <button onClick={() => sendMessage.mutate(newMessage)}>Send</button>
+          </div>
+          <div className="form-section">
+            <textarea
+              value={newContent}
+              onChange={(e) => setNewContent(e.target.value)}
+            />
+            <button onClick={() => uploadContent.mutate({ type: 'text', url: newContent })}>Submit</button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
