@@ -17,14 +17,18 @@ const Login = () => {
     axios.post("http://localhost:3000/login", values)
       .then(res => {
         if (res.data.Status === "Success") {
-          navigate("/");
+          localStorage.setItem('token', res.data.token); // Store the token
+          navigate("/chatpage"); // Redirect to Chatpage
           console.log("Login Success @ login page");
         } else {
-          alert(res.data.Error);
+          alert("Register/Signup for the Chat Page or check your login credentials or network.");
           console.log("Login Failed @ login page: " + res.data.Error);
         }
       })
-      .catch(err => console.log("Login Failed @ catch of login page: " + err));
+      .catch(err => {
+        alert("Register/Signup for the Chat Page or check your login credentials or network.");
+        console.log("Login Failed @ catch of login page: " + err);
+      });
   };
 
   return (

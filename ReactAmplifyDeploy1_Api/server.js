@@ -122,6 +122,59 @@ app.post("/signup", (req, res) => {
     });
 });
 
+app.post("/submit-form", (req, res) => {
+    const { token, answers } = req.body;
+    const sql = "SELECT * FROM users WHERE verification_token=?";
+    db.query(sql, [token], (err, result) => {
+        if (err || result.length === 0) {
+            return res.json({ Status: "Error", Message: "Invalid token or user not found" });
+        }
+
+        // Simulate admin rating process
+        const rating = Math.floor(Math.random() * 11); // Random rating between 0 and 10
+        let message = "";
+        let redirect = "";
+
+        if (rating >= 7) {
+            message = "Congratulations! Your answers have been highly rated.";
+            redirect = "/chatpage";
+        } else if (rating >= 4) {
+            message = "Your answers have been rated moderately.";
+            redirect = "/chatpage";
+        } else {
+            message = "Unfortunately, your answers did not meet the expectations.";
+            redirect = "/advisory";
+        }
+
+        const updateSql = "UPDATE users SET rating=? WHERE verification_token=?";
+        db.query(updateSql, [rating, token], (err) => {
+            if (err) return res.json({ Status: "Error", Message: "Error updating user data" });
+
+            // Send email
+            const transporter = nodemailer.createTransport({
+                service: process.env.MAIL_SERVICE,
+                auth: { user: process.env.MAIL_USER, pass: process.env.MAIL_PASS },
+                tls: { rejectUnauthorized: false }
+            });
+
+            const mailOptions = {
+                from: process.env.MAIL_USER,
+                to: result[0].email,
+                subject: 'Your Application Rating',
+                html: `<p>${message}</p>`
+            };
+
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.error('Error sending email:', error);
+                    return res.json({ Status: "Error", Message: "Error sending email" });
+                }
+                res.json({ Status: "Success", Message: message, Redirect: redirect });
+            });
+        });
+    });
+});
+
 app.post("/login", (req, res) => {
     const sql = "SELECT * FROM users WHERE email=?";
     db.query(sql, [req.body.email], (err, data) => {
