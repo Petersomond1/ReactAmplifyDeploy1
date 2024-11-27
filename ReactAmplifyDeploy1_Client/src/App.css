@@ -73,14 +73,257 @@ button:hover {
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.App {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 20px;
 }
 
-textarea {
-  width: calc(100% - 40px);
-  height: 100px;
+.display-section {
+  width: 80%;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.display-section img,
+.display-section video {
+  max-width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.chat-section {
+  width: 80%;
+  margin-bottom: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.messages {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+
+.message {
+  background-color: #e4e6eb;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 5px;
+}
+
+input[type="text"] {
+  width: calc(100% - 80px);
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  margin-bottom: 10px;
+  margin-right: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.form-section {
+  width: 80%;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 
+}
+
+.signup-up-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+ 
+.signup-up-img {
+  width: 27%;
+  padding: 3px;
+  height: auto;
+  background:white;
+  background-size: cover;
+  background-position: center;
+  border-radius: 8px;
+}
+
+.signup-up-form {
+  width: 300px;
+  padding: 20px;
+  border: 2px solid blue;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0 ,0, 0.1);
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #2980b9;
+}
+
+/* CSS for the Home Page btn and btndanger class  */
+
+.btn {
+  display: inline-block;
+  font-weight:  400;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  padding: .375rem .75rem;
+  font-size:  1rem;
+  line-height:  1.5;
+  border-radius: .25rem;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.btn-danger {
+  color: #fff;
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-danger:hover {
+  color: #fff;
+  background-color: #c82333;
+  border-color: #bd2130;
+}
+
+.btn-danger:focus, .btn-danger.focus {
+  color: #fff;
+  background-color: #c82333;
+  border-color: #bd2130;
+  outline:  0;
+  box-shadow:  0  0  0  0.2rem rgba(220,53,69,.5);
+}
+
+.btn-danger.disabled, .btn-danger:disabled {
+  color: #fff;
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-danger:not(:disabled):not(.disabled):active, .btn-danger:not(:disabled):not(.disabled).active,
+.show > .btn-danger.dropdown-toggle {
+  color: #fff;
+  background-color: #bd2130;
+  border-color: #b21f2d;
+}
+
+.btn-danger:not(:disabled):not(.disabled):active:focus, .btn-danger:not(:disabled):not(.disabled).active:focus,
+.show > .btn-danger.dropdown-toggle:focus {
+  box-shadow:  0  0  0  0.2rem rgba(220,53,69,.5);
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-primary:hover {
+  color: #fff;
+  background-color: #0056b3;
+  border-color: #004499;
+}
+
+.btn-primary:focus, .btn-primary.focus {
+  color: #fff;
+  background-color: #0056b3;
+  border-color: #004499;
+  outline:  0;
+  box-shadow:  0  0  0  0.2rem rgba(0,123,255,.25);
+}
+
+.btn-primary.disabled, .btn-primary:disabled {
+  color: #fff;
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active,
+.show > .btn-primary.dropdown-toggle {
+  color: #fff;
+  background-color: #0069d9;
+  border-color: #0062cc;
+}
+
+.btn-primary:not(:disabled):not(.disabled):active:focus, .btn-primary:not(:disabled):not(.disabled).active:focus,
+.show > .btn-primary.dropdown-toggle:focus {
+  box-shadow:  0  0  0  0.2rem rgba(0,123,255,.25);
+}
+
+/* home styles.css */
+
+/* contain-div with margin-top */
+.contain-div {
+  width:  100%;
+  padding-right:  15px;
+  padding-left:  15px;
+  margin-right: auto;
+  margin-left: auto;
+  margin-top:  1.5rem;
+}
+
+
+/* Button */
+.btn {
+  display: inline-block;
+  font-weight:  400;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  padding: .375rem .75rem;
+  font-size:  1rem;
+  line-height:  1.5;
+  border-radius: .25rem;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+/* Danger button */
+.btn-danger {
+  color: #fff;
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+/* Primary button */
+.btn-primary {
+  color: #fff;
+  background-color: #007bff;
+  border-color: #007bff;
 }
