@@ -220,34 +220,34 @@ const authenticate = (req, res, next) => {
 
 // Routes
 app.get('/api/display', authenticate, (req, res) => {
-  db.query('SELECT * FROM display_content ORDER BY id DESC LIMIT 1', (err, result) => {
-    if (err) throw err;
-    res.json(result[0]);
+    db.query('SELECT * FROM display_content ORDER BY id DESC LIMIT 1', (err, result) => {
+      if (err) throw err;
+      res.json(result[0]);
+    });
   });
-});
-
-app.get('/api/messages', authenticate, (req, res) => {
-  db.query('SELECT * FROM messages', (err, result) => {
-    if (err) throw err;
-    res.json(result);
+  
+  app.get('/api/messages', authenticate, (req, res) => {
+    db.query('SELECT * FROM messages', (err, result) => {
+      if (err) throw err;
+      res.json(result);
+    });
   });
-});
-
-app.post('/api/messages', authenticate, (req, res) => {
-  const { message } = req.body;
-  db.query('INSERT INTO messages (content) VALUES (?)', [message], (err, result) => {
-    if (err) throw err;
-    res.json({ id: result.insertId, content: message });
+  
+  app.post('/api/messages', authenticate, (req, res) => {
+    const { message } = req.body;
+    db.query('INSERT INTO messages (content) VALUES (?)', [message], (err, result) => {
+      if (err) throw err;
+      res.json({ id: result.insertId, content: message });
+    });
   });
-});
-
-app.post('/api/upload', authenticate, (req, res) => {
-  const { type, url } = req.body;
-  db.query('INSERT INTO display_content (type, url) VALUES (?, ?)', [type, url], (err, result) => {
-    if (err) throw err;
-    res.json({ id: result.insertId, type, url });
+  
+  app.post('/api/upload', authenticate, (req, res) => {
+    const { type, url } = req.body;
+    db.query('INSERT INTO display_content (type, url) VALUES (?, ?)', [type, url], (err, result) => {
+      if (err) throw err;
+      res.json({ id: result.insertId, type, url });
+    });
   });
-});
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
