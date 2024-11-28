@@ -3,10 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import '../app.css';
+import './chatpage.css';
+import ContentListing from './ContentListing';
+import ContentImageVideoDisplay from './ContentImageVideoDisplay';
+import ChatsbyContent from './ChatsbyContent';
+import Chatboard from './Chatboard';
 
 const Chatpage = () => {
   const [newMessage, setNewMessage] = useState('');
-  const [newContent, setNewContent] = useState('');
   const [authToken, setAuthToken] = useState(localStorage.getItem('token'));
   const [auth, setAuth] = useState(false);
   const [username, setUsername] = useState('');
@@ -45,7 +49,7 @@ const Chatpage = () => {
       }).catch(err => console.log(err));
   };
 
-  const { data: displayContent } = useQuery({
+  const { data: displayContent, isLoading: isLoadingDisplay } = useQuery({
     queryKey: ['display'],
     queryFn: () =>
       axios.get(`${import.meta.env.BASE_URL}/api/display`, {
@@ -53,7 +57,7 @@ const Chatpage = () => {
       }).then(res => res.data),
   });
 
-  const { data: messages } = useQuery({
+  const { data: messages, isLoading: isLoadingMessages } = useQuery({
     queryKey: ['messages'],
     queryFn: () =>
       axios.get(`${import.meta.env.BASE_URL}/api/messages`, {
@@ -72,17 +76,6 @@ const Chatpage = () => {
     },
   });
 
-  const uploadContent = useMutation({
-    mutationFn: (content) =>
-      axios.post(`${import.meta.env.BASE_URL}/api/upload`, content, {
-        headers: { Authorization: authToken },
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['display'] });
-      setNewContent('');
-    },
-  });
-
   if (!authToken) {
     return null; // Prevent rendering if no authToken
   }
@@ -95,51 +88,34 @@ const Chatpage = () => {
         </div>
       ) : (
         <>
-          <div>Welcome {username}</div>
-          <div>Listing</div>
-          <div>Display</div>
-          <div>Chat</div>
-          <div>Messages</div>
-
-          <div className="display-section">
-            {displayContent &&
-              (displayContent.type === 'image' ? (
-                <img src={displayContent.url} alt="Display" />
-              ) : (
-                <video src={displayContent.url} controls />
-              ))}
-          </div>
-          <div className="chat-section">
-            <div className="messages">
-              {messages &&
-                messages.map((msg) => (
-                  <div key={msg.id} className="message">
-                    {msg.content}
-                  </div>
-                ))}
+          <section className='navbar'>
+            <div className='welcome_div'>Welcome {username}</div>
+            <div className='nav_div'>Navigation</div>
+          </section>
+          <section className='display_section'>
+            <div className='display_div'>
+              <ContentListing contentList={[]} />
+              {!isLoadingDisplay && displayContent && (
+                <ContentImageVideoDisplay displayContent={displayContent} />
+              )}
+              {!isLoadingMessages && messages && (
+                <ChatsbyContent messages={messages} />
+              )}
             </div>
-            <input
-              type="text"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
+          </section>
+          <section className='message_section'>
+            <Chatboard
+              newMessage={newMessage}
+              setNewMessage={setNewMessage}
+              sendMessage={sendMessage}
             />
-            <button onClick={() => sendMessage.mutate(newMessage)}>Send</button>
-          </div>
-          <div className="form-section">
-            <textarea
-              value={newContent}
-              onChange={(e) => setNewContent(e.target.value)}
-            />
-            <button
-              onClick={() =>
-                uploadContent.mutate({ type: 'text', url: newContent })
-              }
-            >
-              Submit
-            </button>
-          </div>
+          </section>
+          <section className='footer_section'>
+            <div className='footer_div'>footer</div>
+          </section>
           <div>
             <div>{message}</div>
+            <p>Remember to logout, when you're done. Thx</p>
             <button onClick={handleDeleteCookies}>Logout</button>
           </div>
         </>
