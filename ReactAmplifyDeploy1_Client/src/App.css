@@ -1,22 +1,22 @@
+
+
 body {
   font-family: Arial, sans-serif;
   background-color: #f0f2f5;
   margin: 0;
   padding: 0;
+  background-color: #f9fafb;
 }
 
-.App {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-}
+
+
 
 .display-section {
   width: 80%;
   margin-bottom: 20px;
   text-align: center;
 }
+
 
 .display-section img,
 .display-section video {
@@ -75,75 +75,7 @@ button:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.App {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-}
 
-.display-section {
-  width: 80%;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.display-section img,
-.display-section video {
-  max-width: 100%;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.chat-section {
-  width: 80%;
-  margin-bottom: 20px;
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-}
-
-.messages {
-  max-height: 300px;
-  overflow-y: auto;
-  margin-bottom: 10px;
-}
-
-.message {
-  background-color: #e4e6eb;
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 5px;
-}
-
-input[type="text"] {
-  width: calc(100% - 80px);
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  margin-right: 10px;
-}
-
-button {
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-.form-section {
-  width: 80%;
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 
-}
 
 .signup-up-container {
   display: flex;
@@ -327,3 +259,5 @@ button:hover {
   background-color: #007bff;
   border-color: #007bff;
 }
+ 
+
