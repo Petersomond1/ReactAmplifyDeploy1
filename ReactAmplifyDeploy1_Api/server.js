@@ -8,9 +8,15 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const sharp = require('sharp');
+const ffmpeg = require('fluent-ffmpeg');
+const multer = require('multer');
+const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+const upload = multer({ dest: 'uploads/' });
 
 app.use(bodyParser.json());
 app.use(cors({
@@ -35,6 +41,10 @@ db.connect(err => {
   console.log('Connected to database');
 });
 
+const generateUniqueId = () => {
+  return crypto.randomBytes(3).toString('hex'); // Generates a 6-figure alphanumeric ID
+};
+
 const verifyUser = (req, res, next) => {
     const token = req.cookies.token;
     if (!token) {
@@ -45,6 +55,8 @@ const verifyUser = (req, res, next) => {
                 return res.json({ Error: "Invalid token" });
             } else {
                 req.username = decoded.username;
+                req.email = decoded.email;
+                req.submitter = decoded.submitter;
                 next();
             }
         });
@@ -76,12 +88,13 @@ app.get("/verify/:token", (req, res) => {
 
 app.post("/signup", (req, res) => {
     console.log('req.body at /signup', req.body);
-    const sql = "INSERT INTO users (username, email, password, verification_token) VALUES (?)";
+    const sql = "INSERT INTO users (username, email, password, verification_token, userclass, submitter) VALUES (?)";
     const token = crypto.randomBytes(32).toString('hex');
+    const submitterId = generateUniqueId();
     bcrypt.hash(req.body.password.toString(), 10, (err, hash) => {
         if (err) return res.json({ Error: "Error hashing password" });
 
-        const values = [req.body.username, req.body.email, hash, token];
+        const values = [req.body.username, req.body.email, hash, token, req.body.userclass, submitterId];
         db.query(sql, [values], (err, result) => {
             console.log('result at server', result);
             if (err) {
@@ -176,7 +189,9 @@ app.post("/login", (req, res) => {
                 if (err) return res.json({ Error: "Error comparing passwords" });
                 if (response) {
                     const username = data[0].username;
-                    const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: "1d" });
+                    const email = data[0].email;
+                    const submitter = data[0].submitter;
+                    const token = jwt.sign({ username, email, submitter }, SECRET_KEY, { expiresIn: "1d" });
                     res.cookie("token", token, {
                         httpOnly: true,
                         sameSite: "lax", // Use "none" for cross-origin; ensure HTTPS if secure
@@ -200,7 +215,7 @@ app.get("/logout", (req, res) => {
 
 // Middleware for JWT
 const authenticate = (req, res, next) => {
-    const token = req.cookies.token; // Access token from cookies
+  const token = req.headers['authorization'];
   if (!token) return res.status(401).json({ message: 'Access denied' });
 
   jwt.verify(token, SECRET_KEY, (err, user) => {
@@ -212,9 +227,9 @@ const authenticate = (req, res, next) => {
 
 // Routes
 app.get('/api/display', authenticate, (req, res) => {
-  db.query('SELECT * FROM display_content ORDER BY id DESC ', (err, result) => {
+  db.query('SELECT * FROM submissions ORDER BY id DESC LIMIT 1', (err, result) => {
     if (err) throw err;
-    res.json(result);
+    res.json(result[0]);
   });
 });
 
@@ -227,17 +242,71 @@ app.get('/api/messages', authenticate, (req, res) => {
 
 app.post('/api/messages', authenticate, (req, res) => {
   const { message } = req.body;
-  db.query('INSERT INTO messages (content) VALUES (?)', [message], (err, result) => {
+  const { username, email, submitter } = req.user;
+  const sql = "INSERT INTO messages (username, email, content, messagelog, submitter) VALUES (?, ?, ?, ?, ?)";
+  const messageLog = crypto.randomBytes(16).toString('hex');
+  db.query(sql, [username, email, message, messageLog, submitter], (err, result) => {
     if (err) throw err;
-    res.json({ id: result.insertId, content: message });
+    res.json({ id: result.insertId, username, email, content: message, messagelog: messageLog, submitter });
+  });
+});
+
+// Function to generate image thumbnail
+const generateImageThumbnail = async (inputPath, outputPath) => {
+  try {
+    await sharp(inputPath)
+      .resize({ width: 100 })
+      .toFile(outputPath);
+    console.log('Thumbnail created successfully');
+  } catch (error) {
+    console.error('Error generating thumbnail:', error);
+  }
+};
+
+// Function to generate video thumbnail
+const generateVideoThumbnail = (inputPath, outputPath) => {
+  ffmpeg(inputPath)
+    .screenshots({
+      timestamps: ['50%'],
+      filename: outputPath,
+      size: '320x240'
+    })
+    .on('end', () => {
+      console.log('Thumbnail created successfully');
+    })
+    .on('error', (err) => {
+      console.error('Error generating thumbnail:', err);
+    });
+};
+
+app.post('/upload', upload.single('file'), (req, res) => {
+  const file = req.file;
+  const outputPath = path.join('thumbnails', `${file.filename}.jpg`);
+
+  if (file.mimetype.startsWith('image/')) {
+    generateImageThumbnail(file.path, outputPath);
+  } else if (file.mimetype.startsWith('video/')) {
+    generateVideoThumbnail(file.path, outputPath);
+  }
+
+  // Save file and thumbnail info to the database
+  const sql = "INSERT INTO submissions (title, image_url, video_url, icon, submitter, audience) VALUES (?, ?, ?, ?, ?, ?)";
+  const values = [file.originalname, file.mimetype.startsWith('image/') ? file.path : null, file.mimetype.startsWith('video/') ? file.path : null, outputPath, req.user.submitter, req.body.audience];
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error('Error saving to database:', err);
+      return res.status(500).json({ Error: "Error saving to database" });
+    }
+    res.json({ message: 'File uploaded and thumbnail generated', id: result.insertId });
   });
 });
 
 app.post('/api/upload', authenticate, (req, res) => {
-  const { type, url } = req.body;
-  db.query('INSERT INTO display_content (type, url) VALUES (?, ?)', [type, url], (err, result) => {
+  const { title, description, text, image_url, video_url, emoji, icon, audience } = req.body;
+  const sql = "INSERT INTO submissions (title, description, text, image_url, video_url, emoji, icon, submitter, audience) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+  db.query(sql, [title, description, text, image_url, video_url, emoji, icon, req.user.submitter, audience], (err, result) => {
     if (err) throw err;
-    res.json({ id: result.insertId, type, url });
+    res.json({ id: result.insertId, title, description, text, image_url, video_url, emoji, icon, submitter: req.user.submitter, audience });
   });
 });
 

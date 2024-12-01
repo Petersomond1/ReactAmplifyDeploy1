@@ -22,7 +22,10 @@ const Chatpage = () => {
   useEffect(() => {
     if (authToken) {
       axios
-        .get("http://localhost:3000", { withCredentials: true })
+        .get("http://localhost:3000", {
+          headers: { Authorization: `Bearer ${authToken}` },
+          withCredentials: true,
+        })
         .then((res) => {
           if (res.data.Status === "Success") {
             setAuth(true);
@@ -58,36 +61,46 @@ const Chatpage = () => {
 
   const { data: displayContent, isLoading: isLoadingDisplay } = useQuery({
     queryKey: ["display"],
-    queryFn: async () =>{
+    queryFn: async () => {
+      if (!authToken) return;
       try {
-        console.log("sending requeset")
         const result = await axios.get("http://localhost:3000/api/display", {
-          withCredentials:true,
-        })
-        return result.data
+          headers: { Authorization: `Bearer ${authToken}` },
+          withCredentials: true,
+        });
+        return result.data;
       } catch (error) {
-        console.log("error in getting displated data", error)
+        console.log("error in getting displayed data", error);
+        return null;
       }
-    }
+    },
+    enabled: !!authToken,
   });
 
   const { data: messages, isLoading: isLoadingMessages } = useQuery({
     queryKey: ["messages"],
-    queryFn: () =>
-      axios
-        .get("http://localhost:3000/api/messages", {
-          headers: { Authorization: authToken },
-        })
-        .then((res) => res.data),
+    queryFn: async () => {
+      if (!authToken) return;
+      try {
+        const result = await axios.get("http://localhost:3000/api/messages", {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        return result.data;
+      } catch (error) {
+        console.log("error in getting messages", error);
+        return null;
+      }
+    },
+    enabled: !!authToken,
   });
 
   const sendMessage = useMutation({
-    mutationFn: (message) =>
+    mutationFn: ({ message, audience }) =>
       axios.post(
         "http://localhost:3000/api/messages",
-        { message },
+        { message, audience },
         {
-          headers: { Authorization: authToken },
+          headers: { Authorization: `Bearer ${authToken}` },
         }
       ),
     onSuccess: () => {
@@ -96,9 +109,24 @@ const Chatpage = () => {
     },
   });
 
+  const uploadFile = useMutation({
+    mutationFn: ({ file, audience }) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("audience", audience);
+      return axios.post("http://localhost:3000/upload", formData, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["display"] });
+    },
+  });
+
   if (!authToken) {
     return null; // Prevent rendering if no authToken
   }
+
   return (
     <div className="chatpage-container">
       {authToken && !auth ? (
@@ -124,32 +152,41 @@ const Chatpage = () => {
           <section className="display_section">
             <div className="display_div">
               <div className="contentlisting_div">
+                <p>Content Listing</p>
                 <ContentListing contentList={[]} />
               </div>
               <div className="mid_display_div">
-                <div className="contentimagevideodisplay_div" >
-                    <ContentImageVideoDisplay displayContent={displayContent} />
+                <div className="contentimagevideodisplay_div">
+                  <p>Main Content</p>
+                  <ContentImageVideoDisplay displayContent={displayContent} />
                 </div>
-                <div className="chatboard-logout_div" >
+                <section className="chatboard-logout_div">
                   <div className="chatboard_section">
                     <p>Chatboard</p>
                     <Chatboard
                       newMessage={newMessage}
                       setNewMessage={setNewMessage}
                       sendMessage={sendMessage}
+                      uploadFile={uploadFile}
                     />
+                    {sendMessage.isLoading && <div>Sending message...</div>}
+                    {sendMessage.isError && (
+                      <div>Error sending message: {sendMessage.error.message}</div>
+                    )}
+                    {sendMessage.isSuccess && <div>Message sent!</div>}
                   </div>
-                </div>
-                <div className="logout_middisplaydiv">
-                  <p>Remember to logout, when you're done. Thx</p>
-                  <button onClick={handleDeleteCookies}>Logout</button>
-                </div>
+                  <div className="logout_middisplaydiv">
+                    <p>Remember to logout, when you're done. Thx</p>
+                    <button onClick={handleDeleteCookies}>Logout</button>
+                  </div>
+                </section>
               </div>
-              <div className="chatsbycontent_div">
+              <section className="chatsbycontent_div">
+                <p>ChatsbyContent or msg_by_content</p>
                 {!isLoadingMessages && messages && (
                   <ChatsbyContent messages={messages} />
                 )}
-              </div>
+              </section>
             </div>
           </section>
           <section className="footer_section">
