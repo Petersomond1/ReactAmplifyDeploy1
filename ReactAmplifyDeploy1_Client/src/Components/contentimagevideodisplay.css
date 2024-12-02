@@ -1,3 +1,41 @@
-.content-image-video-display {
-    /* Add your styles here */
-  }
+.content-image-video-display-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.content-item {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 300px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.content-text, .content-emoji, .content-image, .content-video, .content-music {
+  margin-bottom: 10px;
+}
+
+.content-image {
+  width: 100%;
+  height: auto;
+}
+
+.content-video, .content-music {
+  width: 100%;
+  height: auto;
+}
+
+.content-details {
+  margin-top: 10px;
+}
+
+.content-title {
+  font-weight: bold;
+}
+
+.content-description, .content-timestamp, .content-submitter {
+  font-size: 0.9em;
+  color: #555;
+}

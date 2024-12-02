@@ -6,7 +6,9 @@ const AdminPage = () => {
   const [users, setUsers] = useState([]);
   const [submissions, setSubmissions] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [selectedSubmission, setSelectedSubmission] = useState(null);
+  const [rating, setRating] = useState('');
+  const [userclass, setUserclass] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     // Fetch users and submissions
@@ -28,6 +30,21 @@ const AdminPage = () => {
     });
   };
 
+  const handleUpdateUser = () => {
+    if (!/^[a-zA-Z0-9]{6}$/.test(userclass)) {
+      setError('Userclass must be a 6-figure alphanumeric ID');
+      return;
+    }
+    axios.post('/api/admin/user/update', { userId: selectedUser, rating, userclass }).then(res => {
+      // Update users list
+      setUsers(users.map(user => (user.id === selectedUser ? res.data : user)));
+      setSelectedUser(null);
+      setRating('');
+      setUserclass('');
+      setError('');
+    });
+  };
+
   return (
     <div className="admin-page">
       <h1>Admin Page</h1>
@@ -40,10 +57,26 @@ const AdminPage = () => {
               <button className="ban" onClick={() => handleUserAction(user.id, 'ban')}>Ban</button>
               <button className="unban" onClick={() => handleUserAction(user.id, 'unban')}>Unban</button>
               <button className="grant" onClick={() => handleUserAction(user.id, 'grant')}>Grant Posting Rights</button>
+              <button onClick={() => setSelectedUser(user.id)}>Update</button>
             </li>
           ))}
         </ul>
       </div>
+      {selectedUser && (
+        <div className="admin-section">
+          <h2>Update User</h2>
+          <div>
+            <label>Rating:</label>
+            <input type="number" value={rating} onChange={(e) => setRating(e.target.value)} />
+          </div>
+          <div>
+            <label>Userclass:</label>
+            <input type="text" value={userclass} onChange={(e) => setUserclass(e.target.value)} />
+          </div>
+          {error && <div className="error">{error}</div>}
+          <button onClick={handleUpdateUser}>Update User</button>
+        </div>
+      )}
       <div className="admin-section">
         <h2>Submissions</h2>
         <ul>

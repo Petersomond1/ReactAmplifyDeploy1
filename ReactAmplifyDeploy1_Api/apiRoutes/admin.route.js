@@ -1,9 +1,8 @@
 import express from 'express';
-import { authenticate } from '../middleware/authenticate.js'; // Ensure you have an authenticate middleware
+import { authenticate } from '../middleware/authenticate.js';
 
 const router = express.Router();
 
-// Admin Endpoints
 router.get('/users', authenticate, (req, res) => {
   const sql = "SELECT * FROM users";
   db.query(sql, (err, result) => {
@@ -44,6 +43,18 @@ router.post('/user/grant', authenticate, (req, res) => {
   db.query(sql, [userId], (err, result) => {
     if (err) throw err;
     res.json({ id: userId, posting_rights: 1 });
+  });
+});
+
+router.post('/user/update', authenticate, (req, res) => {
+  const { userId, rating, userclass } = req.body;
+  if (!/^[a-zA-Z0-9]{6}$/.test(userclass)) {
+    return res.status(400).json({ Error: "Userclass must be a 6-figure alphanumeric ID" });
+  }
+  const sql = "UPDATE users SET rating=?, userclass=? WHERE id=?";
+  db.query(sql, [rating, userclass, userId], (err, result) => {
+    if (err) throw err;
+    res.json({ id: userId, rating, userclass });
   });
 });
 

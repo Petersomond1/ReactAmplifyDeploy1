@@ -1,14 +1,32 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import './contentimagevideodisplay.css';
 
 const ContentImageVideoDisplay = ({ displayContent }) => {
+  const [playingMedia, setPlayingMedia] = useState(null);
+  const videoRef = useRef(null);
+  const audioRef = useRef(null);
+
+  const handlePlay = (type) => {
+    if (type === 'video') {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      setPlayingMedia('video');
+    } else if (type === 'music') {
+      if (videoRef.current) {
+        videoRef.current.pause();
+      }
+      setPlayingMedia('music');
+    }
+  };
+
   if (!displayContent || displayContent.length === 0) {
     return <div>Loading...</div>;
   }
 
   return (
     <div className="content-image-video-display-container">
-      {displayContent?.map((content, index) => (
+      {displayContent.map((content, index) => (
         <div key={index} className="content-item">
           {content.text && (
             <div className="content-text">
@@ -24,10 +42,21 @@ const ContentImageVideoDisplay = ({ displayContent }) => {
           )}
           {content.video_url && (
             <video 
+              ref={videoRef}
               src={content.video_url} 
               controls 
               alt={`content-video-${index}`} 
               className="content-video"
+              onPlay={() => handlePlay('video')}
+            />
+          )}
+          {content.music_url && (
+            <audio 
+              ref={audioRef}
+              src={content.music_url} 
+              controls 
+              className="content-music"
+              onPlay={() => handlePlay('music')}
             />
           )}
           {content.emoji && (

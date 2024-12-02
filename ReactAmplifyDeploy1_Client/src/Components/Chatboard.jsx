@@ -29,7 +29,7 @@ const Chatboard = ({ newMessage, setNewMessage, sendMessage, uploadFile }) => {
       />
       <button onClick={handleSendMessage}>Send</button>
       <input type="file" onChange={handleFileChange} />
-      <button onClick={handleFileUpload}>Upload</button>
+      <button onClick={handleFileUpload}>Set Audience</button>
       <select value={audience} onChange={(e) => setAudience(e.target.value)}>
         <option value="General">General</option>
         <option value="submitter">Submitter</option>

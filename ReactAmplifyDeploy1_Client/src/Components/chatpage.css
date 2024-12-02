@@ -118,13 +118,15 @@
 
   .logout_middisplaydiv {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     /* justify-content: center; */
     align-items: center;
     padding: 10px 15px;
     border-top: 1px solid #e5e7eb;
     background: #f3f4f6;
     /* width: 100%; */
+    color: black;
+    align-Content:center;
   }
   
   .footer_section {

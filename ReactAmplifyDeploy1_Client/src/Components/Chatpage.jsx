@@ -95,10 +95,10 @@ const Chatpage = () => {
   });
 
   const sendMessage = useMutation({
-    mutationFn: ({ message, audience, targetId }) =>
+    mutationFn: ({ message, audience }) =>
       axios.post(
         "http://localhost:3000/api/messages",
-        { message, audience, targetId },
+        { message, audience },
         {
           headers: { Authorization: `Bearer ${authToken}` },
         }
@@ -110,11 +110,10 @@ const Chatpage = () => {
   });
 
   const uploadFile = useMutation({
-    mutationFn: ({ file, audience, targetId }) => {
+    mutationFn: ({ file, audience }) => {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("audience", audience);
-      formData.append("targetId", targetId);
       return axios.post("http://localhost:3000/upload", formData, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
@@ -176,10 +175,7 @@ const Chatpage = () => {
                     )}
                     {sendMessage.isSuccess && <div>Message sent!</div>}
                   </div>
-                  <div className="logout_middisplaydiv">
-                    <p>Remember to logout, when you're done. Thx</p>
-                    <button onClick={handleDeleteCookies}>Logout</button>
-                  </div>
+                  
                 </section>
               </div>
               <section className="chatsbycontent_div">
@@ -191,7 +187,16 @@ const Chatpage = () => {
             </div>
           </section>
           <section className="footer_section">
-            <div className="footer_div">footer</div>
+            <div className="footer_div">A Clarion Call to Re-Build Zion</div>
+            <div className="footer_div">
+              <div className="logout_middisplaydiv">
+                <div>
+                  Need help? Request for help at <a href="mailto:administrator@gmail.com">administrator@gmail.com</a>
+                </div>
+                <div>Remember to logout, when you're done. Thx</div>
+              </div>
+              <button onClick={handleDeleteCookies}>Logout</button>
+            </div>
           </section>
         </>
       )}
