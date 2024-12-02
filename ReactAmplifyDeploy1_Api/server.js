@@ -1,17 +1,26 @@
-require('dotenv').config();
-const express = require('express');
-const mysql = require('mysql');
-const bodyParser = require('body-parser');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
-const nodemailer = require('nodemailer');
-const crypto = require('crypto');
-const sharp = require('sharp');
-const ffmpeg = require('fluent-ffmpeg');
-const multer = require('multer');
-const path = require('path');
+import dotenv from 'dotenv';
+import express from 'express';
+import mysql from 'mysql';
+import bodyParser from 'body-parser';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import nodemailer from 'nodemailer';
+import crypto from 'crypto';
+import sharp from 'sharp';
+import ffmpeg from 'fluent-ffmpeg';
+import multer from 'multer';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+// Import routes
+import authRoutes from './apiRoutes/auth.route.js';
+import contentRoutes from './apiRoutes/content.route.js';
+import adminRoutes from './apiRoutes/admin.route.js';
+
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -226,6 +235,10 @@ const authenticate = (req, res, next) => {
 };
 
 // Routes
+app.use('/auth', authRoutes);
+app.use('/content', contentRoutes);
+app.use('/admin', adminRoutes);
+
 app.get('/api/display', authenticate, (req, res) => {
   db.query('SELECT * FROM submissions ORDER BY id DESC LIMIT 1', (err, result) => {
     if (err) throw err;
@@ -241,13 +254,13 @@ app.get('/api/messages', authenticate, (req, res) => {
 });
 
 app.post('/api/messages', authenticate, (req, res) => {
-  const { message } = req.body;
+  const { message, audience, targetId } = req.body;
   const { username, email, submitter } = req.user;
-  const sql = "INSERT INTO messages (username, email, content, messagelog, submitter) VALUES (?, ?, ?, ?, ?)";
+  const sql = "INSERT INTO messages (username, email, content, messagelog, submitter, audience, targetId) VALUES (?, ?, ?, ?, ?, ?, ?)";
   const messageLog = crypto.randomBytes(16).toString('hex');
-  db.query(sql, [username, email, message, messageLog, submitter], (err, result) => {
+  db.query(sql, [username, email, message, messageLog, submitter, audience, targetId], (err, result) => {
     if (err) throw err;
-    res.json({ id: result.insertId, username, email, content: message, messagelog: messageLog, submitter });
+    res.json({ id: result.insertId, username, email, content: message, messagelog: messageLog, submitter, audience, targetId });
   });
 });
 
@@ -290,8 +303,8 @@ app.post('/upload', upload.single('file'), (req, res) => {
   }
 
   // Save file and thumbnail info to the database
-  const sql = "INSERT INTO submissions (title, image_url, video_url, icon, submitter, audience) VALUES (?, ?, ?, ?, ?, ?)";
-  const values = [file.originalname, file.mimetype.startsWith('image/') ? file.path : null, file.mimetype.startsWith('video/') ? file.path : null, outputPath, req.user.submitter, req.body.audience];
+  const sql = "INSERT INTO submissions (title, image_url, video_url, icon, submitter, audience, targetId) VALUES (?, ?, ?, ?, ?, ?, ?)";
+  const values = [file.originalname, file.mimetype.startsWith('image/') ? file.path : null, file.mimetype.startsWith('video/') ? file.path : null, outputPath, req.user.submitter, req.body.audience, req.body.targetId];
   db.query(sql, values, (err, result) => {
     if (err) {
       console.error('Error saving to database:', err);
@@ -302,11 +315,11 @@ app.post('/upload', upload.single('file'), (req, res) => {
 });
 
 app.post('/api/upload', authenticate, (req, res) => {
-  const { title, description, text, image_url, video_url, emoji, icon, audience } = req.body;
-  const sql = "INSERT INTO submissions (title, description, text, image_url, video_url, emoji, icon, submitter, audience) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-  db.query(sql, [title, description, text, image_url, video_url, emoji, icon, req.user.submitter, audience], (err, result) => {
+  const { title, description, text, image_url, video_url, emoji, icon, audience, targetId } = req.body;
+  const sql = "INSERT INTO submissions (title, description, text, image_url, video_url, emoji, icon, submitter, audience, targetId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+  db.query(sql, [title, description, text, image_url, video_url, emoji, icon, req.user.submitter, audience, targetId], (err, result) => {
     if (err) throw err;
-    res.json({ id: result.insertId, title, description, text, image_url, video_url, emoji, icon, submitter: req.user.submitter, audience });
+    res.json({ id: result.insertId, title, description, text, image_url, video_url, emoji, icon, submitter: req.user.submitter, audience, targetId });
   });
 });
 

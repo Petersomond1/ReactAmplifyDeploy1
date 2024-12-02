@@ -95,10 +95,10 @@ const Chatpage = () => {
   });
 
   const sendMessage = useMutation({
-    mutationFn: ({ message, audience }) =>
+    mutationFn: ({ message, audience, targetId }) =>
       axios.post(
         "http://localhost:3000/api/messages",
-        { message, audience },
+        { message, audience, targetId },
         {
           headers: { Authorization: `Bearer ${authToken}` },
         }
@@ -110,10 +110,11 @@ const Chatpage = () => {
   });
 
   const uploadFile = useMutation({
-    mutationFn: ({ file, audience }) => {
+    mutationFn: ({ file, audience, targetId }) => {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("audience", audience);
+      formData.append("targetId", targetId);
       return axios.post("http://localhost:3000/upload", formData, {
         headers: { Authorization: `Bearer ${authToken}` },
       });

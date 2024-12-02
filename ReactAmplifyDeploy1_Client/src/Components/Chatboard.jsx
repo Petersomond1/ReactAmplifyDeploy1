@@ -4,6 +4,7 @@ import './chatboard.css';
 const Chatboard = ({ newMessage, setNewMessage, sendMessage, uploadFile }) => {
   const [file, setFile] = useState(null);
   const [audience, setAudience] = useState('General');
+  const [targetId, setTargetId] = useState('');
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -11,8 +12,12 @@ const Chatboard = ({ newMessage, setNewMessage, sendMessage, uploadFile }) => {
 
   const handleFileUpload = () => {
     if (file) {
-      uploadFile.mutate({ file, audience });
+      uploadFile.mutate({ file, audience, targetId });
     }
+  };
+
+  const handleSendMessage = () => {
+    sendMessage.mutate({ message: newMessage, audience, targetId });
   };
 
   return (
@@ -22,7 +27,7 @@ const Chatboard = ({ newMessage, setNewMessage, sendMessage, uploadFile }) => {
         value={newMessage}
         onChange={(e) => setNewMessage(e.target.value)}
       />
-      <button onClick={() => sendMessage.mutate({ message: newMessage, audience })}>Send</button>
+      <button onClick={handleSendMessage}>Send</button>
       <input type="file" onChange={handleFileChange} />
       <button onClick={handleFileUpload}>Upload</button>
       <select value={audience} onChange={(e) => setAudience(e.target.value)}>
@@ -30,6 +35,14 @@ const Chatboard = ({ newMessage, setNewMessage, sendMessage, uploadFile }) => {
         <option value="submitter">Submitter</option>
         <option value="userclass">Userclass</option>
       </select>
+      {(audience === 'submitter' || audience === 'userclass') && (
+        <input
+          type="text"
+          placeholder="Enter 6-alphanumeric ID"
+          value={targetId}
+          onChange={(e) => setTargetId(e.target.value)}
+        />
+      )}
     </div>
   );
 };
