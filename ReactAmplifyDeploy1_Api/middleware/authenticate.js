@@ -6,7 +6,7 @@ dotenv.config();
 const SECRET_KEY = process.env.SECRET_KEY;
 
 export const authenticate = (req, res, next) => {
-  const token = req.headers['authorization'];
+  const token = req.cookies.token;
   if (!token) return res.status(401).json({ message: 'Access denied' });
 
   jwt.verify(token, SECRET_KEY, (err, user) => {

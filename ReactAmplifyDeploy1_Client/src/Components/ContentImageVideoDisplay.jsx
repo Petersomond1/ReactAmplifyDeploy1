@@ -24,9 +24,10 @@ const ContentImageVideoDisplay = ({ displayContent }) => {
     return <div>Loading...</div>;
   }
 
+  console.log('"display content', displayContent)
   return (
     <div className="content-image-video-display-container">
-      {displayContent.map((content, index) => (
+      {displayContent?.map((content, index) => (
         <div key={index} className="content-item">
           {content.text && (
             <div className="content-text">

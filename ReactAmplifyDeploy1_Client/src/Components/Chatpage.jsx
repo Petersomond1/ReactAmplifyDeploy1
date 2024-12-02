@@ -22,7 +22,7 @@ const Chatpage = () => {
   useEffect(() => {
     if (authToken) {
       axios
-        .get("http://localhost:3000", {
+        .get("http://localhost:3000/auth", {
           headers: { Authorization: `Bearer ${authToken}` },
           withCredentials: true,
         })
@@ -64,7 +64,7 @@ const Chatpage = () => {
     queryFn: async () => {
       if (!authToken) return;
       try {
-        const result = await axios.get("http://localhost:3000/api/display", {
+        const result = await axios.get("http://localhost:3000/content/display", {
           headers: { Authorization: `Bearer ${authToken}` },
           withCredentials: true,
         });
@@ -82,8 +82,9 @@ const Chatpage = () => {
     queryFn: async () => {
       if (!authToken) return;
       try {
-        const result = await axios.get("http://localhost:3000/api/messages", {
+        const result = await axios.get("http://localhost:3000/content/messages", {
           headers: { Authorization: `Bearer ${authToken}` },
+          withCredentials: true,
         });
         return result.data;
       } catch (error) {
@@ -126,6 +127,7 @@ const Chatpage = () => {
   if (!authToken) {
     return null; // Prevent rendering if no authToken
   }
+
 
   return (
     <div className="chatpage-container">
