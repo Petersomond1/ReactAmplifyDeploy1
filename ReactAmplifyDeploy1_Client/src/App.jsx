@@ -14,7 +14,7 @@ function App() {
       <Routes>
         <Route path="/" element={<ClarionCall />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/formpage/:token" element={<FormPage />} />
+        <Route path="/formpage" element={<FormPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/chatpage" element={<Chatpage />} />
         <Route path="/admin" element={<AdminPage />} />

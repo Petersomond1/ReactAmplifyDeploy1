@@ -13,21 +13,26 @@ const FormPage = () => {
         return res.data;
     };
 
-    const mutation = useMutation(submitForm, {
-        onSuccess: (data) => {
-            navigate(data.Redirect);
-            alert(data.Message);
-        },
-        onError: (error) => {
-            console.error("Error submitting form:", error);
-            alert("Submission failed, please try again.");
-        }
-    });
+    // const mutation = useMutation(submitForm, {
+    //     onSuccess: (data) => {
+    //         navigate(data.Redirect);
+    //         alert(data.Message);
+    //     },
+    //     onError: (error) => {
+    //         console.error("Error submitting form:", error);
+    //         alert("Submission failed, please try again.");
+    //     }
+    // });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        mutation.mutate({ token, answers });
+        //mutation.mutate({ token, answers });
     };
+
+
+    // now the signup is done you will work on the login , 
+    // when you do the login in the backend you verify if the user is confirmed redirect him to the chat page else redirect him to the form page to fill the form or show 
+    //message that he is pending  
 
     const handleInputChange = (index, value) => {
         const updatedAnswers = [...answers];
