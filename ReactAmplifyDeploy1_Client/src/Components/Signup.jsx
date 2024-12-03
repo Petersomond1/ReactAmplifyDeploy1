@@ -16,11 +16,12 @@ const Signup = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const res = await axios.post("http://localhost:3000/signup", values, { withCredentials: true });
+      console.log("user values", values)
+      const res = await axios.post("http://localhost:3000/api/auth/register", values, { withCredentials: true });
       console.log(res.data);
-      if (res.data.Status === "Success") {
-        alert("Signup Success @ signup page");
-        navigate(`/formpage/${res.data.token}`);
+      if (res.status === 201) {
+        //alert("Signup Success @ signup page");
+        navigate(`${res.data.redirectTo}`);
       } else {
         alert("Error: " + res.data.Error + " - " + "Signup Failed @ alert signup page");
       }
