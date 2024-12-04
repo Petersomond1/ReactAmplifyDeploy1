@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
   }
 });
 
-// Only accept certain file types (e.g., images, videos, etc.)
+// Only accept certain file types (e.g., texts, musics, images, videos, emoji, gifs, etc.)
 const fileFilter = (req, file, cb) => {
   const filetypes = /jpeg|jpg|png|gif|mp4/; // Allowed file types
   const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
@@ -29,8 +29,10 @@ const fileFilter = (req, file, cb) => {
 
 const uploadMiddleware = multer({
   storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // Max size 10MB
+  limits: { fileSize: 100 * 1024 * 1024 }, // Max size: 100MB
   fileFilter: fileFilter
 });
 
 export default uploadMiddleware;
+
+//To allow multiple files to be uploaded into same content

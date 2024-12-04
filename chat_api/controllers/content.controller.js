@@ -42,4 +42,7 @@ export const getAllContent = async (req, res) => {
       res.status(500).json({ error: 'An error occurred while fetching comments.' });
     }
   };
+
+  //component to create icon is needed. 
+  
   

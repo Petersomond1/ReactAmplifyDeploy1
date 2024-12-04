@@ -19,15 +19,12 @@ const Login = () => {
         if (res.data.Status === "Success") {
           localStorage.setItem('token', res.data.token); // Store the token
           navigate("/chatpage"); // Redirect to Chatpage
-          console.log("Login Success @ login page");
         } else {
           alert("Register/Signup for the Chat Page or check your login credentials or network.");
-          console.log("Login Failed @ login page: " + res.data.Error);
         }
       })
       .catch(err => {
         alert("Register/Signup for the Chat Page or check your login credentials or network.");
-        console.log("Login Failed @ catch of login page: " + err);
       });
   };
 

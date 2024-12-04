@@ -1,18 +1,23 @@
-export const assignClassToUser = async (req, res) => {
+import { assignUserToClassService, getClassContentService } from '../services/class.service.js';
+
+export const assignUserToClass = async (req, res) => {
     try {
-      // Business logic for assigning a class to a user
+        const { userId, classId } = req.body;
+        await assignUserToClassService(userId, classId);
+        res.status(200).json({ message: 'User assigned to class successfully' });
     } catch (error) {
-      console.error('Error in assignClassToUser:', error.message);
-      res.status(500).json({ error: 'An error occurred while assigning the class.' });
+        console.error('Error in assignUserToClass:', error.message);
+        res.status(500).json({ error: 'An error occurred while assigning the user to the class.' });
     }
-  };
-  
-  export const getClassContent = async (req, res) => {
+};
+
+export const getClassContent = async (req, res) => {
     try {
-      // Business logic for fetching class-specific content
+        const { classId } = req.params;
+        const content = await getClassContentService(classId);
+        res.status(200).json(content);
     } catch (error) {
-      console.error('Error in getClassContent:', error.message);
-      res.status(500).json({ error: 'An error occurred while fetching class content.' });
+        console.error('Error in getClassContent:', error.message);
+        res.status(500).json({ error: 'An error occurred while retrieving the class content.' });
     }
-  };
-  
+};

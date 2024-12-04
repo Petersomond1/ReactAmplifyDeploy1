@@ -8,6 +8,7 @@ const Signup = () => {
     username: "",
     email: "",
     password: "",
+    phone: "",
   });
 
   axios.defaults.withCredentials = true;
@@ -16,17 +17,13 @@ const Signup = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      console.log("user values", values)
-      const res = await axios.post("http://localhost:3000/api/auth/register", values, { withCredentials: true });
-      console.log(res.data);
+      const res = await axios.post("http://localhost:3000/auth/register", values, { withCredentials: true });
       if (res.status === 201) {
-        //alert("Signup Success @ signup page");
         navigate(`${res.data.redirectTo}`);
       } else {
-        alert("Error: " + res.data.Error + " - " + "Signup Failed @ alert signup page");
+        alert("Error: " + res.data.error + " - " + "Signup Failed");
       }
     } catch (err) {
-      console.log(err + " - " + "Signup Failed @ catch of signup page");
       alert("Signup failed, please check your network and try again.");
     }
   };
@@ -54,6 +51,18 @@ const Signup = () => {
               placeholder="Enter Email"
               name="email"
               onChange={e => setValues({ ...values, email: e.target.value })}
+              className="form-control"
+            />
+          </label>
+        </div>
+        <div style={{ marginBottom: "3px" }}>
+          <label htmlFor="phone"><strong>Phone:</strong>
+            <input
+              type="phone"
+              autoComplete="off"
+              placeholder="Enter Phone Number"
+              name="phone"
+              onChange={e => setValues({ ...values, phone: e.target.value })}
               className="form-control"
             />
           </label>

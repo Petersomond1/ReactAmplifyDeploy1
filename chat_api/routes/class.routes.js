@@ -1,14 +1,11 @@
 import express from 'express';
-import {
-  assignClassToUser,
-  getClassContent,
-} from '../controllers/class.controller.js';
-import { authenticate, authorize } from '../middlewares/auth.middleware.js';
+import { assignUserToClass, getClassContent } from '../controllers/class.controller.js';
+import { authenticate } from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
-// Assign a class to a user (admin only)
-router.post('/assign', authenticate, authorize('admin'), assignClassToUser);
+// Assign user to class
+router.post('/assign', authenticate, assignUserToClass);
 
 // Get content for a specific class
 router.get('/:classId/content', authenticate, getClassContent);

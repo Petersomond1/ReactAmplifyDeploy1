@@ -17,7 +17,7 @@ function App() {
         <Route path="/formpage" element={<FormPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/chatpage" element={<Chatpage />} />
-        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/adminpage" element={<AdminPage />} />
       </Routes>
     </BrowserRouter>
   );

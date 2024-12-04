@@ -1,57 +1,79 @@
-import { registerUserService, loginUserService, sendPasswordResetEmail } from "../services/auth.service.js";
-import {generateToken} from "../utils/jwt.js";
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
+import crypto from 'crypto';
+import db from '../config/db.js';
+import { generateToken } from '../utils/jwt.js';
+import { registerUserService, loginUserService } from '../services/auth.service.js';
+
+const SECRET_KEY = process.env.SECRET_KEY;
 
 export const registerUser = async (req, res, next) => {
     try {
-      const { username, email, password, phone = "2514632" } = req.body;
+        const { username, email, password, phone } = req.body;
 
-      // Validation (you could use a package like express-validator for this)
-      if (!username || !email || !password || !phone) {
-        throw new CustomError('All fields are required', 400);
-      }
-      console.log("user data", req.body);
-      const userId = await registerUserService({ username, email, password, phone });
-      
-      const user = { userId, email, isAdmin: false, isConfirmed: false }; // You can modify this to fetch the actual user's details after registration
-      const token = generateToken(user);
+        if (!username || !email || !password || !phone) {
+            return res.status(400).json({ error: 'All fields are required' });
+        }
 
-      res.cookie('access_token', token, { httpOnly: true }); // Set the token in a cookie
-  
-      // Send the response with the token and redirect URL
-      res.status(201).json({
-        message: 'Registration successful',
-        redirectTo: '/formPage', // Provide the redirection URL for frontend to handle
-      });
+        const userId = await registerUserService({ username, email, password, phone });
+        const user = { userId, email, isAdmin: false, isConfirmed: false };
+        const token = generateToken(user);
 
+        res.cookie('access_token', token, { httpOnly: true });
+
+        res.status(201).json({
+            message: 'Pre-Registration successful; please take the survey to complete registration',
+            redirectTo: '/formPage',
+        });
     } catch (error) {
-      next(error); // Forward error to the error handler
+        next(error);
     }
-  };
-  
-export const loginUser = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      throw new CustomError('Email and password are required', 400);
-    }
-
-    const token = await loginUserService(email, password);
-
-    res.cookie('access_token', token, { httpOnly: true }); // Set the token in a cookie
-
-    res.status(200).json({ message: 'Login successful' });
-  } catch (err) {
-    next(err); // Forward error to the error handler
-  }
 };
 
-export const logoutUser = async (req, res) => {
-try {
-    // Business logic for user logout
-} catch (error) {
-    console.error('Error in logoutUser:', error.message);
-    res.status(500).json({ error: 'An error occurred while logging out the user.' });
-}
+export const loginUser = async (req, res, next) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Email and password are required' });
+        }
+
+        const token = await loginUserService(email, password);
+
+        res.cookie('access_token', token, { httpOnly: true });
+
+        res.status(200).json({ message: 'Login successful' });
+    } catch (err) {
+        next(err);
+    }
 };
-  
+
+export const logoutUser = (req, res) => {
+    res.clearCookie("access_token");
+    return res.json({ Status: "Success" });
+};
+
+export const verifyUser = async (req, res) => {
+    try {
+        const sql = "SELECT * FROM users WHERE verification_token=?";
+        const [result] = await db.execute(sql, [req.params.token]);
+
+        if (result.length === 0) {
+            return res.json({ error: "Invalid token" });
+        }
+
+        const updateSql = "UPDATE users SET is_verified=1 WHERE verification_token=?";
+        await db.execute(updateSql, [req.params.token]);
+
+        res.redirect(`http://localhost:5173/formpage/${req.params.token}`);
+    } catch (err) {
+        console.error(err);
+        return res.json({ error: err.message || "Error verifying token" });
+    }
+};
+
+export const getAuthenticatedUser = (req, res) => {
+    res.set("Access-Control-Allow-Credentials", "true");
+    return res.json({ Status: "Success", username: req.user.username, setAuth: true });
+};
