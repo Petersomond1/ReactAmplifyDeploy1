@@ -5,8 +5,10 @@ import {
   createContent,
   addCommentToContent,
   getCommentsByContentId,
+  uploadContent
 } from '../controllers/content.controller.js';
-import { authenticate, authorize } from '../middlewares/auth.middleware.js';
+import { uploadMiddleware, uploadToS3 } from '../middlewares/uploadMiddleware.js';
+import { authenticate } from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
@@ -24,5 +26,8 @@ router.post('/:id/comments', authenticate, addCommentToContent);
 
 // Get comments for a specific content
 router.get('/:id/comments', authenticate, getCommentsByContentId);
+
+// Upload content
+router.post('/upload', authenticate, uploadMiddleware.array('files', 10), uploadToS3, uploadContent);
 
 export default router;

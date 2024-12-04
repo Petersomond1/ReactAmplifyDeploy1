@@ -9,12 +9,40 @@ const AdminPage = () => {
   const [rating, setRating] = useState('');
   const [userclass, setUserclass] = useState('');
   const [error, setError] = useState('');
+  const [files, setFiles] = useState([]);
+  const [description, setDescription] = useState('');
+  const [audience, setAudience] = useState('General');
+  const [targetId, setTargetId] = useState('');
 
   useEffect(() => {
     // Fetch users and submissions
     axios.get('/api/admin/users').then(res => setUsers(res.data));
     axios.get('/api/admin/submissions').then(res => setSubmissions(res.data));
   }, []);
+
+  const handleFileChange = (e) => {
+    setFiles([...e.target.files]);
+  };
+
+  const handleFileUpload = () => {
+    if (files.length > 0) {
+      const formData = new FormData();
+      files.forEach(file => formData.append('files', file));
+      formData.append('description', description);
+      formData.append('audience', audience);
+      formData.append('targetId', targetId);
+
+      axios.post('/api/content/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then(res => {
+        alert('Files uploaded successfully');
+      }).catch(err => {
+        alert('Error uploading files');
+      });
+    }
+  };
 
   const handleUserAction = (userId, action) => {
     axios.post(`/api/admin/user/${action}`, { userId }).then(res => {
@@ -48,6 +76,29 @@ const AdminPage = () => {
   return (
     <div className="admin-page">
       <h1>Admin Page</h1>
+      <div className="admin-section">
+        <h2>Upload Content</h2>
+        <input type="file" multiple onChange={handleFileChange} />
+        <textarea
+          placeholder="Enter description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+        <select value={audience} onChange={(e) => setAudience(e.target.value)}>
+          <option value="General">General</option>
+          <option value="submitter">Submitter</option>
+          <option value="userclass">Userclass</option>
+        </select>
+        {(audience === 'submitter' || audience === 'userclass') && (
+          <input
+            type="text"
+            placeholder="Enter 6-alphanumeric ID"
+            value={targetId}
+            onChange={(e) => setTargetId(e.target.value)}
+          />
+        )}
+        <button onClick={handleFileUpload}>Upload Files</button>
+      </div>
       <div className="admin-section">
         <h2>Users</h2>
         <ul>
