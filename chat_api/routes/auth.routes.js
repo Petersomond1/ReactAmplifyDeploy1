@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerUser, loginUser, logoutUser, verifyUser, getAuthenticatedUser } from '../controllers/auth.controller.js';
+import { registerUser, loginUser, logoutUser, verifyUser, getAuthenticatedUser, submitForm } from '../controllers/auth.controller.js';
 import { authenticate } from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
@@ -18,5 +18,8 @@ router.get('/verify/:token', verifyUser);
 
 // Get authenticated user
 router.get("/", authenticate, getAuthenticatedUser);
+
+// Submit form
+router.post('/submit-form', submitForm);
 
 export default router;

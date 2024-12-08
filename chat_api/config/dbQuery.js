@@ -1,4 +1,3 @@
-// utils/dbQuery.js
 import db from './db.js';
 
 const dbQuery = async (sql, params = []) => {

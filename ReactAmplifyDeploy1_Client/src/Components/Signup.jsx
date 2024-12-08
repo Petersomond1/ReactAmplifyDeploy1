@@ -17,9 +17,10 @@ const Signup = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const res = await axios.post("http://localhost:3000/auth/register", values, { withCredentials: true });
+      const res = await axios.post("http://localhost:3000/api/auth/register", values, { withCredentials: true });
       if (res.status === 201) {
         navigate(`${res.data.redirectTo}`);
+        console.log('res data at signup', res.data);
       } else {
         alert("Error: " + res.data.error + " - " + "Signup Failed");
       }

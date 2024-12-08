@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useMutation } from '@tanstack/react-query';
+import { useMutation } from 'react-query';
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 
@@ -9,7 +9,14 @@ const FormPage = () => {
     const [answers, setAnswers] = useState(['', '', '', '', '']);
 
     const submitForm = async ({ token, answers }) => {
-        const res = await axios.post("http://localhost:3000/submit-form", { token, answers });
+        if (!token || !answers || !Array.isArray(answers)) {
+            throw new Error('Invalid token or answers');
+        }
+        const res = await axios.post(
+            "http://localhost:3000/api/auth/submit-form",
+            { token: token.toString(), answers }, // Ensure token is a string
+            { withCredentials: true }
+        );
         return res.data;
     };
 
