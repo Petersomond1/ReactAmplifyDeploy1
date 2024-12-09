@@ -20,6 +20,6 @@ router.get('/verify/:token', verifyUser);
 router.get("/", authenticate, getAuthenticatedUser);
 
 // Submit form
-router.post('/submit-form', submitForm);
+router.post('/submit-form', authenticate, submitForm);
 
 export default router;

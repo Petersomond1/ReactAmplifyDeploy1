@@ -2,39 +2,17 @@ import React, { useState } from "react";
 import { useMutation } from 'react-query';
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import { useSendFormaPage } from "../service/formPageService";
 
 const FormPage = () => {
-    const { token } = useParams();
     const navigate = useNavigate();
     const [answers, setAnswers] = useState(['', '', '', '', '']);
-
-    const submitForm = async ({ token, answers }) => {
-        if (!token || !answers || !Array.isArray(answers)) {
-            throw new Error('Invalid token or answers');
-        }
-        const res = await axios.post(
-            "http://localhost:3000/api/auth/submit-form",
-            { token: token.toString(), answers }, // Ensure token is a string
-            { withCredentials: true }
-        );
-        return res.data;
-    };
-
-    const mutation = useMutation(submitForm, {
-        onSuccess: (data) => {
-            navigate(data.Redirect);
-            alert(data.Message);
-        },
-        onError: (error) => {
-            console.error("Error submitting form:", error);
-            alert("Submission failed, please try again.");
-        }
-    });
+    const {mutateAsync:sendFormPage} = useSendFormaPage();
 
     const handleSubmit = (e) => {
-        e.preventDefault();
-        mutation.mutate({ token, answers });
-    };
+      e.preventDefault();
+      sendFormPage( answers );
+  };
 
     const handleInputChange = (index, value) => {
         const updatedAnswers = [...answers];

@@ -71,23 +71,16 @@ export const sendPasswordResetEmail = async (email) => {
     await sendEmail(email, subject, text);
 };
 
-export const submitFormService = async (token, answers) => {
+export const submitFormService = async (answers) => {
     try {
-        if (!token) {
-            throw new CustomError('Token is required', 400);
-        }
-
-        console.log('submitFormService: token:', token);
-        console.log('submitFormService: answers:', answers);
-
-        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-        const email = decodedToken.email;
-
+        console.log("req user", req.user);
+        console.log("req user", answers);
+        const email = req.user.email;
         const sql = 'SELECT * FROM users WHERE email = ?';
-        const [user] = await dbQuery(sql, [email]);
+        const user = await dbQuery(sql, [email]);
 
         if (user.length === 0) {
-            throw new CustomError('Invalid token', 400);
+            throw new CustomError('no user found issue!', 400);
         }
 
         const userId = user[0].id;
@@ -104,7 +97,6 @@ export const submitFormService = async (token, answers) => {
 
         return { success: true };
     } catch (error) {
-        console.error('Error in submitFormService:', error);
         throw new CustomError('Form submission failed', 500, error);
     }
 };

@@ -83,10 +83,9 @@ export const getAuthenticatedUser = (req, res) => {
 
 export const submitForm = async (req, res, next) => {
     try {
-        const { token, answers } = req.body;
         console.log('submitForm controller:', req.body);
 
-        const result = await submitFormService(token, answers);
+        const result = await submitFormService( req.body);
 
         res.status(200).json({
             Message: 'Form submitted successfully',
