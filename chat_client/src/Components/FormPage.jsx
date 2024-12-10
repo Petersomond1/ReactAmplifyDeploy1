@@ -9,9 +9,23 @@ const FormPage = () => {
     const [answers, setAnswers] = useState(['', '', '', '', '']);
     const {mutateAsync:sendFormPage} = useSendFormaPage();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
       e.preventDefault();
-      sendFormPage( answers );
+    try {
+      const response = await sendFormPage(answers, {
+        onSuccess: (data) => {
+          console.log("Form submitted successfully:", data);
+          navigate(data.redirect)
+        },
+        onError: (error) => {
+          console.error("Error submitting form:", error);
+          // Add your error handling logic here
+        },
+      });
+      // Perform actions after mutation completes successfully
+    } catch (err) {
+      console.error("Unhandled error:", err);
+    }
   };
 
     const handleInputChange = (index, value) => {

@@ -12,16 +12,7 @@ const submitForm = async ( answers) => {
     );
     return res.data;
 };
-return useMutation(submitForm, {
-    onSuccess: (data) => {
-        navigate(data.Redirect);
-        alert(data.Message);
-    },
-    onError: (error) => {
-        console.error("Error submitting form:", error);
-        alert("Submission failed, please try again.");
-    }
-});
+return useMutation(submitForm);
 }
 
 

@@ -4,12 +4,12 @@ import CustomError from '../utils/CustomError.js';
 import { sendEmail } from '../utils/email.js';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
+import db from '../config/db.js';
 
 export const registerUserService = async (userData) => {
     const { username, email, password, phone } = userData;
     try {
         const existingUser = await dbQuery('SELECT * FROM users WHERE email = ?', [email]);
-        console.log("user exist", existingUser);
         if (existingUser.length > 0) {
             return { error: true, message: 'User already exists' };
         }
@@ -71,32 +71,35 @@ export const sendPasswordResetEmail = async (email) => {
     await sendEmail(email, subject, text);
 };
 
-export const submitFormService = async (answers) => {
+export const submitFormService = async (answers, email) => {
+
     try {
-        console.log("req user", req.user);
-        console.log("req user", answers);
-        const email = req.user.email;
         const sql = 'SELECT * FROM users WHERE email = ?';
         const user = await dbQuery(sql, [email]);
 
         if (user.length === 0) {
             throw new CustomError('no user found issue!', 400);
         }
-
+        console.log("kmdsf")
         const userId = user[0].id;
 
-        console.log('submitFormService: userId:', userId);
-        console.log('submitFormService: email:', email);
-
         const insertSql = 'INSERT INTO survey_answers (user_id, email, answers) VALUES (?, ?, ?)';
-        await dbQuery(insertSql, [userId, email, JSON.stringify(answers)]);
-
+        const savedForm = await dbQuery(insertSql, [userId, email, JSON.stringify(answers)]);
+        console.log("kdfsdf")
+        if (savedForm.affectedRows === 0) {
+            throw new CustomError('data  failed to be saved in db', 500);
+        }
+        
+        await dbQuery('UPDATE users SET isVerified = 1 WHERE id = ?', [userId]);
+        console.log("sdfdskdfsdf")
+        
         const subject = 'Survey Submission Confirmation';
         const text = `Hello ${user[0].name},\n\nThank you for submitting the survey. Your responses have been recorded.`;
         await sendEmail(email, subject, text);
 
         return { success: true };
     } catch (error) {
-        throw new CustomError('Form submission failed', 500, error);
+        console.log("the issue", error)
+        throw new CustomError('Form submission failed', 500, error.message);
     }
 };

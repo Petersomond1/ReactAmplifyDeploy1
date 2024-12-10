@@ -11,15 +11,12 @@ const SECRET_KEY = process.env.SECRET_KEY;
 export const registerUser = async (req, res, next) => {
     try {
         const { username, email, password, phone } = req.body;
-        console.log('req.body', req.body);
         if (!username || !email || !password || !phone) {
             return res.status(400).json({ error: 'All fields are required' });
         }
-        console.log("here");
         const userId = await registerUserService({ username, email, password, phone });
-        console.log("kjsfd");
         
-        const user = { userId, email, password, isVerified: false, isAdmin: false, isConfirmed: false };
+        const user = { userId, email, isVerified: false, isAdmin: false, isConfirmed: false };
         const token = generatePreRegistrationToken(user);
 
         res.cookie('access_token', token, { httpOnly: true });
@@ -83,14 +80,12 @@ export const getAuthenticatedUser = (req, res) => {
 
 export const submitForm = async (req, res, next) => {
     try {
-        console.log('submitForm controller:', req.body);
-
-        const result = await submitFormService( req.body);
-
-        res.status(200).json({
-            Message: 'Form submitted successfully',
-            Redirect: '/thank-you',
-        });
+        const email = req.user.email;
+        await submitFormService(req.body, email);
+        const userData = { userId: req.user.userId, email, isVerified: 1, isAdmin: req.user.isAdmin, isConfirmed: req.user.isConfirmed };
+        const token = generateToken(userData)
+        res.cookie('access_token', token, { httpOnly: true });
+        res.status(200).json({redirect:"/thankyou"});
     } catch (error) {
         console.error('Error in submitForm controller:', error);
         next(error);
