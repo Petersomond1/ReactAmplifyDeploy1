@@ -7,7 +7,7 @@ export const useSendFormaPage = () => {
 const submitForm = async ( answers) => {
     const res = await api.post(
         "/auth/submit-form",
-        answers , // Ensure token is a string
+        answers , 
         { withCredentials: true }
     );
     return res.data;

@@ -14,7 +14,7 @@ const Login = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    axios.post("http://localhost:3000/auth/login", values)
+    axios.post("http://localhost:3000/api/auth/login", values)
       .then(res => {
         if (res.data.Status === "Success") {
           localStorage.setItem('token', res.data.token); // Store the token
