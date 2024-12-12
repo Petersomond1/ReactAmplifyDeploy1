@@ -25,11 +25,14 @@ router.post('/content/approve/:id', authenticate, authorize('admin'), approveCon
 // Reject content
 router.post('/content/reject/:id', authenticate, authorize('admin'), rejectContent);
 
-// Manage users (e.g., view, deactivate, or delete)
-router.get('/users', authenticate, authorize('admin'), manageUsers);
-
 // Manage content (e.g., view, delete, approve, reject)
 router.get('/content', authenticate, authorize('admin'), manageContent);
+
+// Upload content
+router.post('/content/upload', authenticate, authorize('admin'), uploadMiddleware.array('files', 10), uploadToS3, uploadContent);
+
+// Manage users (e.g., view, deactivate, or delete)
+router.get('/users', authenticate, authorize('admin'), manageUsers);
 
 // Ban user
 router.post('/user/ban', authenticate, authorize('admin'), banUser);
@@ -43,7 +46,5 @@ router.post('/user/grant', authenticate, authorize('admin'), grantPostingRights)
 // Update user details
 router.post('/user/update', authenticate, authorize('admin'), updateUser);
 
-// Upload content
-router.post('/content/upload', authenticate, authorize('admin'), uploadMiddleware.array('files', 10), uploadToS3, uploadContent);
 
 export default router;

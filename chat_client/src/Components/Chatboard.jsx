@@ -33,9 +33,9 @@ const Chatboard = ({ newMessage, setNewMessage, sendMessage, uploadFiles }) => {
         value={newMessage}
         onChange={(e) => setNewMessage(e.target.value)}
       />
-      <button onClick={handleSendMessage}>Send</button>
+      <div className='contentSubmit_container'>
       <input type="file" multiple onChange={handleFileChange} />
-      <button onClick={handleFileUpload}>Upload Files</button>
+      <button >Audience</button>
       <select value={audience} onChange={(e) => setAudience(e.target.value)}>
         <option value="General">General</option>
         <option value="submitter">Submitter</option>
@@ -49,6 +49,9 @@ const Chatboard = ({ newMessage, setNewMessage, sendMessage, uploadFiles }) => {
           onChange={(e) => setTargetId(e.target.value)}
         />
       )}
+      <br />
+       <button onClick={handleSendMessage & handleFileUpload}>Send Content</button>
+      </div>
     </div>
   );
 };

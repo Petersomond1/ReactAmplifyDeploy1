@@ -43,6 +43,28 @@ export const rejectContent = async (req, res) => {
   }
 };
 
+export const manageContent = async (req, res) => {
+  try {
+    const content = await manageContentService();
+    res.status(200).json(content);
+  } catch (error) {
+    console.error('Error in manageContent:', error.message);
+    res.status(500).json({ error: 'An error occurred while managing content.' });
+  }
+};
+
+export const uploadContent = async (req, res) => {
+  try {
+    const { description, audience, targetId } = req.body;
+    const files = req.files;
+    await uploadContentService(files, description, audience, targetId);
+    res.status(200).json({ message: 'Files uploaded successfully' });
+  } catch (error) {
+    console.error('Error in uploadContent:', error.message);
+    res.status(500).json({ error: 'An error occurred while uploading content.' });
+  }
+};
+
 export const manageUsers = async (req, res) => {
   try {
     const users = await manageUsersService();
@@ -53,15 +75,7 @@ export const manageUsers = async (req, res) => {
   }
 };
 
-export const manageContent = async (req, res) => {
-  try {
-    const content = await manageContentService();
-    res.status(200).json(content);
-  } catch (error) {
-    console.error('Error in manageContent:', error.message);
-    res.status(500).json({ error: 'An error occurred while managing content.' });
-  }
-};
+
 
 export const banUser = async (req, res) => {
   try {
@@ -104,17 +118,5 @@ export const updateUser = async (req, res) => {
   } catch (error) {
     console.error('Error in updateUser:', error.message);
     res.status(500).json({ error: 'An error occurred while updating the user.' });
-  }
-};
-
-export const uploadContent = async (req, res) => {
-  try {
-    const { description, audience, targetId } = req.body;
-    const files = req.files;
-    await uploadContentService(files, description, audience, targetId);
-    res.status(200).json({ message: 'Files uploaded successfully' });
-  } catch (error) {
-    console.error('Error in uploadContent:', error.message);
-    res.status(500).json({ error: 'An error occurred while uploading content.' });
   }
 };

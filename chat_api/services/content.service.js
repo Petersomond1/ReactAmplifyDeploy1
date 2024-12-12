@@ -8,7 +8,14 @@ export const uploadContentService = async (description, userId, classId, ispubli
 };
 
 export const getAllContentService = async (userId) => {
-  const sql = 'SELECT * FROM content WHERE user_id = ? OR public = 1';
+  const sql = `
+    SELECT c.id, c.description, c.user_id, c.class_id, c.public, c.approval_status, c.created_at, u.name as submitter, cf.type, cf.file_url
+    FROM content c
+    LEFT JOIN users u ON c.user_id = u.id
+    LEFT JOIN content_files cf ON c.id = cf.content_id
+    WHERE c.user_id = ? OR c.public = 1
+    ORDER BY c.created_at DESC
+  `;
   const [content] = await db.execute(sql, [userId]);
   return content;
 };
