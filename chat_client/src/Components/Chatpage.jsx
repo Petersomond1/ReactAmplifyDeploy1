@@ -22,7 +22,7 @@ const Chatpage = () => {
   useEffect(() => {
     if (authToken) {
       axios
-        .get("http://localhost:3000/auth", {
+        .get("http://localhost:3000/api/auth", {
           headers: { Authorization: `Bearer ${authToken}` },
           withCredentials: true,
         })
@@ -50,7 +50,7 @@ const Chatpage = () => {
 
   const handleDeleteCookies = () => {
     axios
-      .get("http://localhost:3000/logout")
+      .get("http://localhost:3000/api/auth/logout")
       .then((res) => {
         localStorage.removeItem("token"); // Remove the token
         location.reload(true);
@@ -81,7 +81,7 @@ const Chatpage = () => {
     queryFn: async () => {
       if (!authToken) return;
       try {
-        const result = await axios.get("http://localhost:3000/content/display", {
+        const result = await axios.get("http://localhost:3000/api/content/display", {
           headers: { Authorization: `Bearer ${authToken}` },
           withCredentials: true,
         });
@@ -99,7 +99,7 @@ const Chatpage = () => {
     queryFn: async () => {
       if (!authToken) return;
       try {
-        const result = await axios.get("http://localhost:3000/content/messages", {
+        const result = await axios.get("http://localhost:3000/api/content/messages", {
           headers: { Authorization: `Bearer ${authToken}` },
           withCredentials: true,
         });
@@ -115,7 +115,7 @@ const Chatpage = () => {
   const sendMessage = useMutation({
     mutationFn: ({ message, audience }) =>
       axios.post(
-        "http://localhost:3000/api/messages",
+        "http://localhost:3000/api/content/messages",
         { message, audience },
         {
           headers: { Authorization: `Bearer ${authToken}` },
@@ -132,7 +132,7 @@ const Chatpage = () => {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("audience", audience);
-      return axios.post("http://localhost:3000/upload", formData, {
+      return axios.post("http://localhost:3000/api/content/upload", formData, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
     },

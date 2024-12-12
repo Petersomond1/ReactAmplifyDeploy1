@@ -4,7 +4,7 @@ import './adminpage.css';
 
 const AdminPage = () => {
   const [users, setUsers] = useState([]);
-  const [submissions, setSubmissions] = useState([]);
+  const [content, setContent] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [rating, setRating] = useState('');
   const [userclass, setUserclass] = useState('');
@@ -15,9 +15,9 @@ const AdminPage = () => {
   const [targetId, setTargetId] = useState('');
 
   useEffect(() => {
-    // Fetch users and submissions
+    // Fetch users and contents
     axios.get('/api/admin/users').then(res => setUsers(res.data));
-    axios.get('/api/admin/submissions').then(res => setSubmissions(res.data));
+    axios.get('/api/admin/content').then(res => setContent(res.data));
   }, []);
 
   const handleFileChange = (e) => {
@@ -32,7 +32,7 @@ const AdminPage = () => {
       formData.append('audience', audience);
       formData.append('targetId', targetId);
 
-      axios.post('/api/content/upload', formData, {
+      axios.post('/api/admin/content/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -51,10 +51,10 @@ const AdminPage = () => {
     });
   };
 
-  const handleSubmissionAction = (submissionId, action) => {
-    axios.post(`/api/admin/submission/${action}`, { submissionId }).then(res => {
-      // Update submissions list
-      setSubmissions(submissions.map(sub => (sub.id === submissionId ? res.data : sub)));
+  const handleContentAction = (contentId, action) => {
+    axios.post(`/api/admin/content/${action}`, { contentId }).then(res => {
+      // Update contents list
+      setContent(content.map(sub => (sub.id === contentId ? res.data : sub)));
     });
   };
 
@@ -129,13 +129,13 @@ const AdminPage = () => {
         </div>
       )}
       <div className="admin-section">
-        <h2>Submissions</h2>
+        <h2>Content Submissions</h2>
         <ul>
-          {submissions?.map(sub => (
+          {content?.map(sub => (
             <li key={sub.id}>
               {sub.title} - {sub.submitter}
-              <button className="feature" onClick={() => handleSubmissionAction(sub.id, 'feature')}>Feature</button>
-              <button className="remove" onClick={() => handleSubmissionAction(sub.id, 'remove')}>Remove</button>
+              <button className="feature" onClick={() => handleContentAction(sub.id, 'feature')}>Feature</button>
+              <button className="remove" onClick={() => handleContentAction(sub.id, 'remove')}>Remove</button>
             </li>
           ))}
         </ul>
