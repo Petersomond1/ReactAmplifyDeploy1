@@ -1,3 +1,5 @@
+import db from '../config/db.js';
+import { v4 as uuidv4 } from 'uuid';
 import {
   getPendingContentService,
   approveContentService,
@@ -9,6 +11,7 @@ import {
   grantPostingRightsService,
   updateUserService,
   uploadContentService,
+  uploadClarionContentService
 } from '../services/admin.service.js';
 
 export const getPendingContent = async (req, res) => {
@@ -65,6 +68,30 @@ export const uploadContent = async (req, res) => {
   }
 };
 
+export const uploadClarionContent = async (req, res) => {
+  try {
+    const { clarionContent } = req.body;
+    const files = req.files;
+
+    if (!files || files.length === 0) {
+      return res.status(400).json({ error: 'No files uploaded' });
+    }
+
+    const contentId = uuidv4();
+
+    const filePromises = files.map(file => {
+      return db.execute('INSERT INTO clarion_content (id, type, file_url, clarionContent) VALUES (?, ?, ?, ?)', [contentId, file.type, file.location, clarionContent]);
+    });
+
+    await Promise.all(filePromises);
+
+    res.status(201).json({ message: 'Clarion Call content uploaded successfully', contentId });
+  } catch (error) {
+    console.error('Error uploading Clarion Call content:', error);
+    res.status(500).json({ error: 'Error uploading Clarion Call content' });
+  }
+};
+
 export const manageUsers = async (req, res) => {
   try {
     const users = await manageUsersService();
@@ -74,8 +101,6 @@ export const manageUsers = async (req, res) => {
     res.status(500).json({ error: 'An error occurred while managing users.' });
   }
 };
-
-
 
 export const banUser = async (req, res) => {
   try {

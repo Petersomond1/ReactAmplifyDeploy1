@@ -1,78 +1,70 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import './contentimagevideodisplay.css';
 
-const ContentImageVideoDisplay = ({ displayContent }) => {
-  const [playingMedia, setPlayingMedia] = useState(null);
+const ContentImageVideoDisplay = ({ selectedContent }) => {
   const videoRef = useRef(null);
   const audioRef = useRef(null);
 
-  const handlePlay = (type) => {
-    if (type === 'video') {
-      if (audioRef.current) {
-        audioRef.current.pause();
+  useEffect(() => {
+    if (selectedContent) {
+      if (selectedContent.type === 'video' && videoRef.current) {
+        videoRef.current.play();
+      } else if (selectedContent.type === 'music' && audioRef.current) {
+        audioRef.current.play();
       }
-      setPlayingMedia('video');
-    } else if (type === 'music') {
-      if (videoRef.current) {
-        videoRef.current.pause();
-      }
-      setPlayingMedia('music');
     }
-  };
+  }, [selectedContent]);
 
-  if (!displayContent || displayContent.length === 0) {
+  if (!selectedContent) {
     return <div>Loading...</div>;
   }
 
-  console.log('"display content', displayContent)
+  console.log("data from ContentImageVideoDisplay: ", selectedContent);
   return (
     <div className="content-image-video-display-container">
-      {displayContent?.map((content, index) => (
-        <div key={index} className="content-item">
-          {content.text && (
-            <div className="content-text">
-              {content.text}
-            </div>
-          )}
-          {content.image_url && (
-            <img 
-              src={content.image_url} 
-              alt={`content-image-${index}`} 
-              className="content-image" 
-            />
-          )}
-          {content.video_url && (
-            <video 
-              ref={videoRef}
-              src={content.video_url} 
-              controls 
-              alt={`content-video-${index}`} 
-              className="content-video"
-              onPlay={() => handlePlay('video')}
-            />
-          )}
-          {content.music_url && (
-            <audio 
-              ref={audioRef}
-              src={content.music_url} 
-              controls 
-              className="content-music"
-              onPlay={() => handlePlay('music')}
-            />
-          )}
-          {content.emoji && (
-            <div className="content-emoji">
-              {content.emoji}
-            </div>
-          )}
-          <div className="content-details">
-            <div className="content-title">{content.title}</div>
-            <div className="content-description">{content.description}</div>
-            <div className="content-timestamp">{content.timestamp}</div>
-            <div className="content-submitter">{content.submitter}</div>
-          </div>
+      {selectedContent?.text && (
+        <div className="content-text">
+          {selectedContent.text}
         </div>
-      ))}
+      )}
+      {selectedContent.file_url && (
+        <>
+        <h1>{selectedContent?.image_url}</h1>
+        <img 
+          src={selectedContent?.file_url} 
+          alt={`content-image`} 
+          className="content-image" 
+        />
+        </>
+      )}
+      {selectedContent?.video_url && (
+        <video 
+          ref={videoRef}
+          src={selectedContent.video_url} 
+          controls 
+          alt={`content-video`} 
+          className="content-video"
+        />
+      )}
+      {selectedContent?.music_url && (
+        <audio 
+          ref={audioRef}
+          src={selectedContent.music_url} 
+          controls 
+          className="content-music"
+        />
+      )}
+      {selectedContent?.emoji && (
+        <div className="content-emoji">
+          {selectedContent.emoji}
+        </div>
+      )}
+      <div className="content-details">
+        <div className="content-title">{selectedContent.title}</div>
+        <div className="content-description">{selectedContent.description}</div>
+        <div className="content-timestamp">{selectedContent.timestamp}</div>
+        <div className="content-submitter">{selectedContent.submitter}</div>
+      </div>
     </div>
   );
 };

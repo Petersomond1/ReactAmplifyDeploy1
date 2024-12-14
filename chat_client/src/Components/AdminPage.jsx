@@ -13,11 +13,23 @@ const AdminPage = () => {
   const [description, setDescription] = useState('');
   const [audience, setAudience] = useState('General');
   const [targetId, setTargetId] = useState('');
+  const [clarionContent, setClarionContent] = useState('');
 
   useEffect(() => {
     // Fetch users and contents
-    axios.get('/api/admin/users').then(res => setUsers(res.data));
-    axios.get('/api/admin/content').then(res => setContent(res.data));
+    axios.get('/api/admin/users')
+      .then(res => setUsers(Array.isArray(res.data) ? res.data : []))
+      .catch(err => {
+        console.error('Error fetching users:', err);
+        setUsers([]);
+      });
+
+    axios.get('/api/admin/content')
+      .then(res => setContent(Array.isArray(res.data) ? res.data : []))
+      .catch(err => {
+        console.error('Error fetching content:', err);
+        setContent([]);
+      });
   }, []);
 
   const handleFileChange = (e) => {
@@ -40,6 +52,31 @@ const AdminPage = () => {
         alert('Files uploaded successfully');
       }).catch(err => {
         alert('Error uploading files');
+      });
+    }
+  };
+
+  const handleClarionFileChange = (e) => {
+    setFiles([...e.target.files]);
+  };
+
+  const handleClarionFileUpload = () => {
+    if (files.length > 0) {
+      const formData = new FormData();
+      files.forEach(file => formData.append('files', file));
+      formData.append('clarionContent', clarionContent);
+
+      axios.post('/api/admin/clarioncontent', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      .then(res => {
+        alert('Content posted to Clarion Call successfully');
+        setClarionContent('');
+      })
+      .catch(err => {
+        alert('Error posting content to Clarion Call');
       });
     }
   };
@@ -99,10 +136,20 @@ const AdminPage = () => {
         )}
         <button onClick={handleFileUpload}>Upload Files</button>
       </div>
+      <div className="admin-clarioncall-section">
+        <h2>Post to Clarion Call</h2>
+        <input type="file" multiple onChange={handleClarionFileChange} />
+        <textarea
+          placeholder="Enter content for Clarion Call"
+          value={clarionContent}
+          onChange={(e) => setClarionContent(e.target.value)}
+        />
+        <button onClick={handleClarionFileUpload}>Post ClarionCall Content</button>
+      </div>
       <div className="admin-section">
         <h2>Users</h2>
         <ul>
-          {users?.map(user => (
+          {users.map(user => (
             <li key={user.id}>
               {user.username} - {user.email}
               <button className="ban" onClick={() => handleUserAction(user.id, 'ban')}>Ban</button>
@@ -131,7 +178,7 @@ const AdminPage = () => {
       <div className="admin-section">
         <h2>Content Submissions</h2>
         <ul>
-          {content?.map(sub => (
+          {content.map(sub => (
             <li key={sub.id}>
               {sub.title} - {sub.submitter}
               <button className="feature" onClick={() => handleContentAction(sub.id, 'feature')}>Feature</button>

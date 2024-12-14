@@ -10,7 +10,9 @@ const Chatboard = ({ newMessage, setNewMessage, sendMessage, uploadFiles }) => {
     setFiles([...e.target.files]);
   };
 
-  const handleFileUpload = () => {
+  const handleFileUpload = (event) => {
+   // const filess = event.target.files;
+    //console.log("files: ", filess);
     if (files.length > 0) {
       const formData = new FormData();
       files.forEach(file => formData.append('files', file));

@@ -1,7 +1,7 @@
 import React from 'react';
 import './contentlisting.css';
 
-const ContentListing = ({ displayContent }) => {
+const ContentListing = ({ displayContent, onSelectContent }) => {
   if (!displayContent || displayContent.length === 0) {
     return <div>No content available</div>;
   }
@@ -9,15 +9,13 @@ const ContentListing = ({ displayContent }) => {
   return (
     <div className="content-listing">
       {displayContent.map((content, index) => (
-        <div key={index} className="content-item">
-          <img src={content.thumbnailUrl} alt={content.title} />
-          {content.type === 'image' && <img src={content.file_url} alt={content.title} />}
-          {content.type === 'video' && <video src={content.file_url} controls />}
-          {content.type === 'text' && <p>{content.description}</p>}
-          <div>{content.title}</div>
-          <div>{content.description}</div>
-          <div>{content.created_at}</div>
-          <div>{content.submitter}</div>
+        <div key={index} className="content-item" onClick={() => onSelectContent(content)} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+          <img src={content.thumbnailUrl} alt={content.title} sizes='5px, 5px'/>
+          <div style={{  marginLeft: '5px' }}>
+            <div><small><p style={{ fontSize: '15px', display: 'inline' }}>Title:</p> {content.title}</small></div>
+            <div><small><p style={{ fontSize: '10px', display: 'inline' }}>On:</p> {content.created_at}</small></div>
+            <div><small><p style={{ fontSize: '10px', display: 'inline' }}>By:</p> {content.submitter}</small></div>
+          </div>
         </div>
       ))}
     </div>

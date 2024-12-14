@@ -1,22 +1,27 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "../App.css";
 
 const ClarionCall = () => {
-  const navigate = useNavigate();
+  const [clarionContent, setClarionContent] = useState([]);
+
+  useEffect(() => {
+    axios.get('/api/clarioncall/content').then(res => setClarionContent(res.data));
+  }, []);
 
   return (
     <div className="clarion-call">
       <h2>Welcome to THE CLARION CALL!</h2>
       <section>
-        <p>
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iusto illum
-          alias error odio nisi reprehenderit{" "}
-        </p>
-        <p>
-          doloremque facere itaque unde distinctio repellendus, impedit in
-          aliquid explicabo qui. Dolor id aperiam atque.
-        </p>
+        {clarionContent.map(content => (
+          <div key={content.id} className="clarion-content-item">
+            {content.type === 'text' && <p>{content.text}</p>}
+            {content.type === 'image' && <img src={content.file_url} alt="content" />}
+            {content.type === 'video' && <video src={content.file_url} controls />}
+            {content.type === 'music' && <audio src={content.file_url} controls />}
+            {content.type === 'emoji' && <div>{content.emoji}</div>}
+          </div>
+        ))}
       </section>
       <p> Login to main Chat page if you've registered/signed-up</p>
       <button onClick={() => navigate("/login")}>Login</button>

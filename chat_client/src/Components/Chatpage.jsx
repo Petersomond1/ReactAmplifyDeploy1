@@ -15,6 +15,8 @@ const Chatpage = () => {
   const [auth, setAuth] = useState(false);
   const [username, setUsername] = useState("");
   const [message, setMessage] = useState("");
+  const [selectedContent, setSelectedContent] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -29,7 +31,8 @@ const Chatpage = () => {
         .then((res) => {
           if (res.data.Status === "Success") {
             setAuth(true);
-            setUsername(res.data.username);
+            setUsername(res.data.username); // Set the username should be set Submitter ID
+            setIsAdmin(res.data.isAdmin);// Check if the user is an admin
             setMessage(
               res.data.Status + " - " + "You are authenticated @ chat page"
             );
@@ -68,7 +71,7 @@ const Chatpage = () => {
           headers: { Authorization: `Bearer ${authToken}` },
           withCredentials: true,
         });
-        return result.data;
+        return result.data;        
       } catch (error) {
         console.log("error in getting displayed data", error);
         return null;
@@ -106,6 +109,20 @@ const Chatpage = () => {
     },
   });
 
+  const addComment = useMutation({
+    mutationFn: (formData) =>
+      axios.post(
+        `http://localhost:3000/api/content/${selectedContent.id}/comments`,
+        formData,
+        {
+          headers: { Authorization: `Bearer ${authToken}` },
+        }
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["display"] });
+    },
+  });
+
   if (!authToken) {
     return null; // Prevent rendering if no authToken
   }
@@ -131,17 +148,22 @@ const Chatpage = () => {
             </div>
             <div>searchbar</div>
             <div className="nav_div">Profile</div>
+            {isAdmin && (
+              <button onClick={() => navigate("/adminpage")}>Admin Page</button>
+            )}
           </section>
           <section className="display_section">
             <div className="display_div">
               <div className="contentlisting_div">
                 <p>Content Listing</p>
-                <ContentListing displayContent={displayContent} />
+                <ContentListing displayContent={displayContent} onSelectContent={setSelectedContent} />
               </div>
               <div className="mid_display_div">
                 <div className="contentimagevideodisplay_div">
                   <p>Main Content</p>
-                  <ContentImageVideoDisplay displayContent={displayContent} />
+                  {displayContent && displayContent.length > 0 && (
+                    <ContentImageVideoDisplay selectedContent={selectedContent || displayContent[0]} />
+                  )}
                 </div>
                 <section className="chatboard-logout_div">
                   <div className="chatboard_section">
@@ -161,9 +183,9 @@ const Chatpage = () => {
                 </section>
               </div>
               <section className="chatsbycontent_div">
-                <p>ChatsbyContent or msg_by_content</p>
-                {!isLoadingDisplay && displayContent && (
-                  <ChatsbyContent messages={displayContent} />
+                <p>Comments</p>
+                {!isLoadingDisplay && selectedContent && (
+                  <ChatsbyContent subComments={selectedContent.comments} onAddComment={addComment.mutate} />
                 )}
               </section>
             </div>

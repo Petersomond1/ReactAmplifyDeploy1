@@ -1,7 +1,23 @@
 .content-image-video-display-container {
   display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+  flex-direction: column;
+  width: 100%; /* Ensure it takes the full width of its parent */
+  padding: 10px;
+  overflow: hidden; /* Ensure no overflow */
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+.contentDisplay {
+  flex: 3;
+  width: 100%;
+  border: 3px solid pink;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden; /* Ensure no overflow */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
 }
 
 .content-item {
@@ -11,6 +27,7 @@
   width: 100%;
   max-width: 300px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
 }
 
 .content-text, .content-emoji, .content-image, .content-video, .content-music {
@@ -20,6 +37,11 @@
 .content-image {
   width: 100%;
   height: auto;
+  max-width: 100%; /* Ensure the image does not exceed the container width */
+  max-height: 100%; /* Ensure the image does not exceed the container height */
+  object-fit: contain; /* Ensure the image scales correctly within the container */
+  display: block; /* Ensure the image is treated as a block element */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
 }
 
 .content-video, .content-music {

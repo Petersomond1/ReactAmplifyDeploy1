@@ -10,6 +10,7 @@ import {
   grantPostingRights,
   updateUser,
   uploadContent,
+  uploadClarionContent
 } from '../controllers/admin.controller.js';
 import { authenticate, authorize } from '../middlewares/auth.middleware.js';
 import { uploadMiddleware, uploadToS3 } from '../middlewares/uploadMiddleware.js';
@@ -30,6 +31,9 @@ router.get('/content', authenticate, authorize('admin'), manageContent);
 
 // Upload content
 router.post('/content/upload', authenticate, authorize('admin'), uploadMiddleware.array('files', 10), uploadToS3, uploadContent);
+
+// Upload Clarion Call content
+router.post('/clarioncontent', authenticate, authorize('admin'), uploadMiddleware.array('files', 10), uploadToS3, uploadClarionContent);
 
 // Manage users (e.g., view, deactivate, or delete)
 router.get('/users', authenticate, authorize('admin'), manageUsers);

@@ -1,3 +1,16 @@
-.chatsby-content {
-    /* Add your styles here */
-  }
+.comments_container {
+  width: 80%;
+  padding: 10px;
+  overflow-y: auto;
+  border-right: 3px solid darkolivegreen;
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+.comments {
+  margin-bottom: 10px;
+}
+
+.comment_info {
+  font-size: 0.8em;
+  color: #666;
+}

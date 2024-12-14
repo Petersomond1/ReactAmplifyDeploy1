@@ -1,14 +1,7 @@
 import dbQuery from '../config/dbQuery.js';
-import CustomError from '../utils/CustomError.js';
 
 export const getPendingContentService = async () => {
-    // "status" is the column name in the content table that stores the approval status of the content
-    // pending is the status of the content that is pending approval by the admin
-    // pending content is content that has been uploaded by users but has not been approved by the admin
-    
-    // pending=0, approved=1, rejected=2;
-
-    const sql = 'SELECT * FROM content WHERE status = "pending"';
+  const sql = 'SELECT * FROM content WHERE status = "pending"';
   const content = await dbQuery(sql);
   return content;
 };
@@ -24,16 +17,25 @@ export const rejectContentService = async (contentId) => {
 };
 
 export const manageContentService = async () => {
-    const sql = 'SELECT * FROM content';
-    const content = await dbQuery(sql);
-    return content;
-  };
+  const sql = 'SELECT * FROM content';
+  const content = await dbQuery(sql);
+  return content;
+};
 
-  export const uploadContentService = async (files, description, audience, targetId) => {
-    const sql = 'INSERT INTO content (description, audience, target_id, files) VALUES (?, ?, ?, ?)';
-    const fileUrls = files.map(file => file.location); // Assuming files are uploaded to S3 and location contains the URL
-    await dbQuery(sql, [description, audience, targetId, JSON.stringify(fileUrls)]);
-  };
+export const uploadContentService = async (files, description, audience, targetId) => {
+  const sql = 'INSERT INTO content (description, audience, target_id, files) VALUES (?, ?, ?, ?)';
+  const fileUrls = files.map(file => file.location); // Assuming files are uploaded to S3 and location contains the URL
+  await dbQuery(sql, [description, audience, targetId, JSON.stringify(fileUrls)]);
+};
+
+export const uploadClarionContentService = async (files, clarionContent) => {
+  const sql = 'INSERT INTO clarion_content (id, type, file_url, clarionContent) VALUES (?, ?, ?, ?)';
+  const contentId = uuidv4();
+  const filePromises = files.map(file => {
+    return dbQuery(sql, [contentId, file.type, file.location, clarionContent]);
+  });
+  await Promise.all(filePromises);
+};
 
 export const manageUsersService = async () => {
   const sql = 'SELECT * FROM users';
@@ -41,8 +43,6 @@ export const manageUsersService = async () => {
   return users;
 };
 
-// PostingRights; banUserService =0, unbanUserService =1, grantPostingRightsService =1, and updateUserService functions
-// PostingRights; banned=0, unbanned=active=1, grantPostingRightsService =1, and updateUserService functions
 export const banUserService = async (userId) => {
   const sql = 'UPDATE users SET postingRight = "banned" WHERE id = ?';
   await dbQuery(sql, [userId]);
@@ -64,4 +64,3 @@ export const updateUserService = async (userId, rating, userclass) => {
   const updatedUser = await dbQuery('SELECT * FROM users WHERE id = ?', [userId]);
   return updatedUser[0];
 };
-
