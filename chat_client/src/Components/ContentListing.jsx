@@ -2,8 +2,8 @@ import React from 'react';
 import './contentlisting.css';
 
 const ContentListing = ({ displayContent, onSelectContent }) => {
-  if (!displayContent || displayContent.length === 0) {
-    return <div>No content available</div>;
+   if (!Array.isArray(displayContent) || displayContent.length === 0) {
+     return <div>No content available</div>;
   }
 
   return (

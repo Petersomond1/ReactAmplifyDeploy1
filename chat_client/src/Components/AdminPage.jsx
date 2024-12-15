@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import './adminpage.css';
 
 const AdminPage = () => {
@@ -10,10 +11,13 @@ const AdminPage = () => {
   const [userclass, setUserclass] = useState('');
   const [error, setError] = useState('');
   const [files, setFiles] = useState([]);
+  const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [audience, setAudience] = useState('General');
   const [targetId, setTargetId] = useState('');
   const [clarionContent, setClarionContent] = useState('');
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Fetch users and contents
@@ -40,6 +44,7 @@ const AdminPage = () => {
     if (files.length > 0) {
       const formData = new FormData();
       files.forEach(file => formData.append('files', file));
+      formData.append('title', title);
       formData.append('description', description);
       formData.append('audience', audience);
       formData.append('targetId', targetId);
@@ -110,12 +115,33 @@ const AdminPage = () => {
     });
   };
 
+  const handleLogout = () => {
+    axios.get('/api/auth/logout').then(() => {
+      localStorage.removeItem("token"); // Remove the token
+      navigate('/');
+    }).catch(err => {
+      console.error('Error logging out:', err);
+    });
+  };
+
+  const returnToChatpage = () => {
+    navigate('/chatpage');
+  };
+
   return (
     <div className="admin-page">
-      <h1>Admin Page</h1>
+      <h1>Admin Dashboard</h1>
+      <button onClick={handleLogout} style={{color: 'red', marginRight:'10px'}}>Logout</button>
+      <button onClick={returnToChatpage}>Return to Chatpage</button>
       <div className="admin-section">
         <h2>Upload Content</h2>
         <input type="file" multiple onChange={handleFileChange} />
+        <textarea
+          placeholder="Enter Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          maxLength={60}
+        />
         <textarea
           placeholder="Enter description"
           value={description}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import axios from "axios";
 import "../app.css";
@@ -8,6 +8,8 @@ import ContentListing from "./ContentListing";
 import ContentImageVideoDisplay from "./ContentImageVideoDisplay";
 import ChatsbyContent from "./ChatsbyContent";
 import Chatboard from "./Chatboard";
+//import Profile from "./Profile";
+
 
 const Chatpage = () => {
   const [newMessage, setNewMessage] = useState("");
@@ -56,7 +58,6 @@ const Chatpage = () => {
       .get("http://localhost:3000/api/auth/logout")
       .then((res) => {
         localStorage.removeItem("token"); // Remove the token
-        location.reload(true);
         navigate("/");
       })
       .catch((err) => console.log(err));
@@ -67,7 +68,7 @@ const Chatpage = () => {
     queryFn: async () => {
       if (!authToken) return;
       try {
-        const result = await axios.get("http://localhost:3000/api/content/", {
+        const result = await axios.get("http://localhost:3000/api/content", {
           headers: { Authorization: `Bearer ${authToken}` },
           withCredentials: true,
         });
@@ -147,7 +148,9 @@ const Chatpage = () => {
               <div>{message}</div>
             </div>
             <div>searchbar</div>
-            <div className="nav_div">Profile</div>
+            <div className="nav_div">
+              <Link to="/profile">Profile</Link>
+            </div>
             {isAdmin && (
               <button onClick={() => navigate("/adminpage")}>Admin Page</button>
             )}

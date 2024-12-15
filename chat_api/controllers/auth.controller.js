@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
 import db from '../config/db.js';
+//import { sendVerificationEmail } from '../utils/email.js';
 import { generatePreRegistrationToken, generateToken } from '../utils/jwt.js';
 import { registerUserService, loginUserService, submitFormService } from '../services/auth.service.js';
 
@@ -50,10 +51,15 @@ export const loginUser = async (req, res, next) => {
     }
 };
 
-export const logoutUser = (req, res) => {
-    res.clearCookie("access_token");
-    return res.json({ Status: "Success" });
-};
+export const logoutUser = async (req, res) => {
+    try {
+      res.clearCookie('token');
+      res.status(200).json({ message: 'Logged out successfully' });
+    } catch (error) {
+      console.error('Error in logoutUser:', error.message);
+      res.status(500).json({ error: 'An error occurred while logging out.' });
+    }
+  };
 
 export const verifyUser = async (req, res) => {
     try {
@@ -76,7 +82,7 @@ export const verifyUser = async (req, res) => {
 
 export const getAuthenticatedUser = (req, res) => {
     res.set("Access-Control-Allow-Credentials", "true");
-    return res.json({ Status: "Success", username: req.user.username, setAuth: true });
+    return res.json({ Status: "Success", userData: { username: req.user.username, email: req.user.email }, setAuth: true });
 };
 
 export const submitForm = async (req, res, next) => {

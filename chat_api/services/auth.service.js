@@ -80,18 +80,18 @@ export const submitFormService = async (answers, email) => {
         if (user.length === 0) {
             throw new CustomError('no user found issue!', 400);
         }
-        console.log("kmdsf")
+       
         const userId = user[0].id;
 
         const insertSql = 'INSERT INTO survey_answers (user_id, email, answers) VALUES (?, ?, ?)';
         const savedForm = await dbQuery(insertSql, [userId, email, JSON.stringify(answers)]);
-        console.log("kdfsdf")
+        
         if (savedForm.affectedRows === 0) {
             throw new CustomError('data  failed to be saved in db', 500);
         }
         
         await dbQuery('UPDATE users SET isVerified = 1 WHERE id = ?', [userId]);
-        console.log("sdfdskdfsdf")
+        
         
         const subject = 'Survey Submission Confirmation';
         const text = `Hello ${user[0].name},\n\nThank you for submitting the survey. Your responses have been recorded.`;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './chatboard.css';
 
-const Chatboard = ({ newMessage, setNewMessage, sendMessage, uploadFiles }) => {
+const Chatboard = ({ newTitle, setNewTitle, newMessage, setNewMessage, sendMessage, uploadFiles }) => {
   const [files, setFiles] = useState([]);
   const [audience, setAudience] = useState('General');
   const [targetId, setTargetId] = useState('');
@@ -10,12 +10,11 @@ const Chatboard = ({ newMessage, setNewMessage, sendMessage, uploadFiles }) => {
     setFiles([...e.target.files]);
   };
 
-  const handleFileUpload = (event) => {
-   // const filess = event.target.files;
-    //console.log("files: ", filess);
+  const handleFileUpload = () => {
     if (files.length > 0) {
       const formData = new FormData();
       files.forEach(file => formData.append('files', file));
+      formData.append('title', newTitle);
       formData.append('description', newMessage);
       formData.append('audience', audience);
       formData.append('targetId', targetId);
@@ -25,34 +24,47 @@ const Chatboard = ({ newMessage, setNewMessage, sendMessage, uploadFiles }) => {
   };
 
   const handleSendMessage = () => {
-    sendMessage.mutate({ message: newMessage, audience, targetId });
+    sendMessage.mutate({ message: newTitle, newMessage, audience, targetId });
+  };
+
+  const handleSendContent = () => {
+   // handleSendTitle();
+    handleSendMessage();
+    handleFileUpload();
   };
 
   return (
     <div className="chatboard">
       <input
         type="text"
+        placeholder="Enter title"
+        value={newTitle}
+        onChange={(e) => setNewTitle(e.target.value)}
+      />
+       <input
+        type="text"
+        placeholder="Enter message"
         value={newMessage}
         onChange={(e) => setNewMessage(e.target.value)}
       />
       <div className='contentSubmit_container'>
-      <input type="file" multiple onChange={handleFileChange} />
-      <button >Audience</button>
-      <select value={audience} onChange={(e) => setAudience(e.target.value)}>
-        <option value="General">General</option>
-        <option value="submitter">Submitter</option>
-        <option value="userclass">Userclass</option>
-      </select>
-      {(audience === 'submitter' || audience === 'userclass') && (
-        <input
-          type="text"
-          placeholder="Enter 6-alphanumeric ID"
-          value={targetId}
-          onChange={(e) => setTargetId(e.target.value)}
-        />
-      )}
-      <br />
-       <button onClick={handleSendMessage & handleFileUpload}>Send Content</button>
+        <input type="file" multiple onChange={handleFileChange} />
+        <button>Audience</button>
+        <select value={audience} onChange={(e) => setAudience(e.target.value)}>
+          <option value="General">General</option>
+          <option value="submitter">Submitter</option>
+          <option value="userclass">Userclass</option>
+        </select>
+        {(audience === 'submitter' || audience === 'userclass') && (
+          <input
+            type="text"
+            placeholder="Enter 6-alphanumeric ID"
+            value={targetId}
+            onChange={(e) => setTargetId(e.target.value)}
+          />
+        )}
+        <br />
+        <button onClick={handleSendContent}>Send Content</button>
       </div>
     </div>
   );

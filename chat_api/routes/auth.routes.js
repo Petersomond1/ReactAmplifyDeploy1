@@ -11,7 +11,7 @@ router.post('/register', registerUser);
 router.post('/login', loginUser);
 
 // User logout
-router.post('/logout', logoutUser);
+router.get('/logout', logoutUser);
 
 // User verification
 router.get('/verify/:token', verifyUser);

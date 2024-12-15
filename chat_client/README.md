@@ -29,3 +29,5 @@ As a search engnine, it should be able to search out terms and phrases from all 
 
 ClarionCall page upload system
 Needs work.
+
+After much stress, the logout snippet from Adminpage and Chatpage was implemented, but that from Adminpage seems to be updating late. Need to check if the crud is post or get, as i had to change it from post to get at the endpoints which i implemented through the auth/logout route instead of admin/logout ??? . 

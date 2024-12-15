@@ -6,6 +6,7 @@ import Chatpage from './Components/Chatpage';
 import FormPage from './Components/FormPage';
 import ClarionCall from './Components/ClarionCall';
 import AdminPage from './Components/AdminPage';
+import Profile from './Components/Profile';
 import './App.css';
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/chatpage" element={<Chatpage />} />
         <Route path="/adminpage" element={<AdminPage />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </BrowserRouter>
   );

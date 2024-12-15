@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../App.css";
+import { useNavigate } from "react-router-dom";
 
 const ClarionCall = () => {
   const [clarionContent, setClarionContent] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('/api/clarioncall/content').then(res => setClarionContent(res.data));
+    axios.get('/api/clarioncall/content')
+      .then(res => setClarionContent(Array.isArray(res.data) ? res.data : []))
+      .catch(err => {
+        console.error('Error fetching Clarion Call content:', err);
+        setClarionContent([]);
+      });
   }, []);
 
   return (
@@ -23,7 +30,7 @@ const ClarionCall = () => {
           </div>
         ))}
       </section>
-      <p> Login to main Chat page if you've registered/signed-up</p>
+      <p> For a deeper explainations and exchange of ideas, Login to the main Chat page, if you've registered/signed-up</p>
       <button onClick={() => navigate("/login")}>Login</button>
       <button onClick={() => navigate("/signup")}>Register</button>
       <p>
