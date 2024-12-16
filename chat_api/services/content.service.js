@@ -1,19 +1,20 @@
 import db from '../config/db.js';
+import { v4 as uuidv4 } from 'uuid';
 
-export const uploadContentService = async (description, userId, classId, ispublic) => {
-  const sql = 'INSERT INTO content (description, userId, class_id, ispublic, approval_status) VALUES (?, ?, ?, ?, ?)';
-  const values = [description, userId, classId, ispublic, 'pending'];
+export const uploadContentService = async (title, description, userId, audience) => {
+  const sql = 'INSERT INTO content (title, description, userId, audience, approval_status) VALUES (?, ?, ?, ?, ?)';
+  const values = [title, description, userId, audience, 'pending'];
   const [result] = await db.execute(sql, values);
   return result.insertId;
 };
 
 export const getAllContentService = async (userId) => {
   const sql = `
-    SELECT c.id, c.title, c.description, c.userId, c.class_id, c.ispublic, c.approval_status, c.created_at, u.name as submitter, cf.type, cf.file_url
+    SELECT c.id, c.title, c.description, c.userId, c.audience, c.approval_status, c.created_at, u.name as submitter, cf.type, cf.file_url
     FROM content c
     LEFT JOIN users u ON c.userId = u.id
     LEFT JOIN content_files cf ON c.id = cf.content_id
-    WHERE c.userId = ? OR c.ispublic = 1
+    WHERE c.userId = ? OR c.audience = 'General'
     ORDER BY c.created_at DESC
   `;
   const [content] = await db.execute(sql, [userId]);
@@ -27,9 +28,9 @@ export const getContentByIdService = async (contentId) => {
 };
 
 export const createContentService = async (contentData, userId) => {
-  const { title, description, classId, ispublic } = contentData;
-  const sql = 'INSERT INTO content (title, description, userId, class_id, ispublic, approval_status) VALUES (?, ?, ?, ?, ?)';
-  const values = [title. description, userId, classId, ispublic, 'pending'];
+  const { title, description, audience } = contentData;
+  const sql = 'INSERT INTO content (title, description, userId, audience, approval_status) VALUES (?, ?, ?, ?, ?)';
+  const values = [title, description, userId, audience, 'pending'];
   const [result] = await db.execute(sql, values);
   return result.insertId;
 };

@@ -1,20 +1,27 @@
 import db from '../config/db.js';
 import { v4 as uuidv4 } from 'uuid';
-import { uploadContentService,
+import { 
+  uploadContentService, 
   getAllContentService, 
-   getContentByIdService, createContentService, addCommentToContentService, getCommentsByContentIdService, uploadClarionContentService, getClarionContentService } from '../services/content.service.js';
+  getContentByIdService, 
+  createContentService, 
+  addCommentToContentService, 
+  getCommentsByContentIdService, 
+  uploadClarionContentService, 
+  getClarionContentService 
+} from '../services/content.service.js';
 
 export const uploadContent = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const { class_id, title, description, ispublic } = req.body;
+    const { audience, title, description } = req.body;
     const files = req.uploadedFiles;
 
     if (!files || files.length === 0) {
       return res.status(400).json({ error: 'No files uploaded' });
     }
 
-    const contentId = await uploadContentService(title, description, userId, class_id, ispublic);
+    const contentId = await uploadContentService(title, description, userId, audience);
 
     const filePromises = files.map(file => {
       return db.execute('INSERT INTO content_files (content_id, type, file_url) VALUES (?, ?, ?)', [contentId, file.type, file.fileUrl]);

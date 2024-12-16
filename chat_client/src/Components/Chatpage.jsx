@@ -8,11 +8,10 @@ import ContentListing from "./ContentListing";
 import ContentImageVideoDisplay from "./ContentImageVideoDisplay";
 import ChatsbyContent from "./ChatsbyContent";
 import Chatboard from "./Chatboard";
-//import Profile from "./Profile";
-
 
 const Chatpage = () => {
   const [newMessage, setNewMessage] = useState("");
+  const [newTitle, setNewTitle] = useState("");
   const [authToken, setAuthToken] = useState(localStorage.getItem("token"));
   const [auth, setAuth] = useState(false);
   const [username, setUsername] = useState("");
@@ -82,10 +81,10 @@ const Chatpage = () => {
   });
 
   const sendMessage = useMutation({
-    mutationFn: ({ message, audience }) =>
+    mutationFn: ({ title, description, audience, targetId }) =>
       axios.post(
         "http://localhost:3000/api/content/messages",
-        { message, audience },
+        { title, description, audience, targetId },
         {
           headers: { Authorization: `Bearer ${authToken}` },
         }
@@ -93,6 +92,7 @@ const Chatpage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["display"] });
       setNewMessage("");
+      setNewTitle("");
     },
   });
 
@@ -172,10 +172,12 @@ const Chatpage = () => {
                   <div className="chatboard_section">
                     <p>Chatboard</p>
                     <Chatboard
+                      newTitle={newTitle}
+                      setNewTitle={setNewTitle}
                       newMessage={newMessage}
                       setNewMessage={setNewMessage}
                       sendMessage={sendMessage}
-                      uploadFile={uploadFile}
+                      uploadFiles={uploadFile}
                     />
                     {sendMessage.isLoading && <div>Sending message...</div>}
                     {sendMessage.isError && (

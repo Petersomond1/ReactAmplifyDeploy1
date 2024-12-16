@@ -58,9 +58,9 @@ export const manageContent = async (req, res) => {
 
 export const uploadContent = async (req, res) => {
   try {
-    const { title, description, audience, targetId } = req.body;
+    const { title, description, audience } = req.body;
     const files = req.files;
-    await uploadContentService(files, title, description, audience, targetId);
+    await uploadContentService(files, title, description, audience);
     res.status(200).json({ message: 'Files uploaded successfully' });
   } catch (error) {
     console.error('Error in uploadContent:', error.message);

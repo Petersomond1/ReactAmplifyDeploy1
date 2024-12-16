@@ -14,7 +14,6 @@ const AdminPage = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [audience, setAudience] = useState('General');
-  const [targetId, setTargetId] = useState('');
   const [clarionContent, setClarionContent] = useState('');
 
   const navigate = useNavigate();
@@ -47,7 +46,6 @@ const AdminPage = () => {
       formData.append('title', title);
       formData.append('description', description);
       formData.append('audience', audience);
-      formData.append('targetId', targetId);
 
       axios.post('/api/admin/content/upload', formData, {
         headers: {
@@ -156,8 +154,8 @@ const AdminPage = () => {
           <input
             type="text"
             placeholder="Enter 6-alphanumeric ID"
-            value={targetId}
-            onChange={(e) => setTargetId(e.target.value)}
+            value={audience}
+            onChange={(e) => setAudience(e.target.value)}
           />
         )}
         <button onClick={handleFileUpload}>Upload Files</button>

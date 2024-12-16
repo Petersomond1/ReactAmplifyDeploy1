@@ -23,10 +23,10 @@ export const manageContentService = async () => {
   return content;
 };
 
-export const uploadContentService = async (files, title, description, audience, targetId) => {
-  const sql = 'INSERT INTO content (title, description, audience, target_id, files) VALUES (?, ?, ?, ?, ?)';
+export const uploadContentService = async (files, title, description, audience) => {
+  const sql = 'INSERT INTO content (title, description, audience, files) VALUES (?, ?, ?, ?)';
   const fileUrls = files.map(file => file.location); // Assuming files are uploaded to S3 and location contains the URL
-  await dbQuery(sql, [title, description, audience, targetId, JSON.stringify(fileUrls)]);
+  await dbQuery(sql, [title, description, audience, JSON.stringify(fileUrls)]);
 };
 
 export const uploadClarionContentService = async (files, clarionContent) => {

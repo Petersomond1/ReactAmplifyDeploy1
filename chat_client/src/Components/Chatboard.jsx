@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import './chatboard.css';
 
-const Chatboard = ({ newTitle, setNewTitle, newMessage, setNewMessage, sendMessage, uploadFiles }) => {
+const Chatboard = ({ newTitle, setNewTitle, newDescription, setNewDescription, newAudience, setNewAudience, sendMessage, uploadFiles }) => {
   const [files, setFiles] = useState([]);
-  const [audience, setAudience] = useState('General');
-  const [targetId, setTargetId] = useState('');
 
   const handleFileChange = (e) => {
     setFiles([...e.target.files]);
@@ -15,52 +13,51 @@ const Chatboard = ({ newTitle, setNewTitle, newMessage, setNewMessage, sendMessa
       const formData = new FormData();
       files.forEach(file => formData.append('files', file));
       formData.append('title', newTitle);
-      formData.append('description', newMessage);
-      formData.append('audience', audience);
-      formData.append('targetId', targetId);
+      formData.append('description', newDescription);
+      formData.append('audience', newAudience);
 
       uploadFiles.mutate(formData);
     }
   };
 
   const handleSendMessage = () => {
-    sendMessage.mutate({ message: newTitle, newMessage, audience, targetId });
+    sendMessage.mutate({ title: newTitle, description: newDescription, audience: newAudience });
   };
 
   const handleSendContent = () => {
-   // handleSendTitle();
     handleSendMessage();
     handleFileUpload();
   };
 
   return (
     <div className="chatboard">
-      <input
+      <textarea
         type="text"
         placeholder="Enter title"
         value={newTitle}
         onChange={(e) => setNewTitle(e.target.value)}
+        maxLength={60}
       />
-       <input
+      <textarea
         type="text"
-        placeholder="Enter message"
-        value={newMessage}
-        onChange={(e) => setNewMessage(e.target.value)}
+        placeholder="Enter description"
+        value={newDescription}
+        onChange={(e) => setNewDescription(e.target.value)}
       />
       <div className='contentSubmit_container'>
         <input type="file" multiple onChange={handleFileChange} />
         <button>Audience</button>
-        <select value={audience} onChange={(e) => setAudience(e.target.value)}>
+        <select value={newAudience} onChange={(e) => setNewAudience(e.target.value)}>
           <option value="General">General</option>
           <option value="submitter">Submitter</option>
           <option value="userclass">Userclass</option>
         </select>
-        {(audience === 'submitter' || audience === 'userclass') && (
+        {(newAudience === 'submitter' || newAudience === 'userclass') && (
           <input
             type="text"
             placeholder="Enter 6-alphanumeric ID"
-            value={targetId}
-            onChange={(e) => setTargetId(e.target.value)}
+            value={newAudience}
+            onChange={(e) => setNewAudience(e.target.value)}
           />
         )}
         <br />
