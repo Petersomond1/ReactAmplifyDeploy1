@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from 'react-query';
 import './adminpage.css';
 
 const AdminPage = () => {
@@ -17,6 +18,7 @@ const AdminPage = () => {
   const [clarionContent, setClarionContent] = useState('');
 
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     // Fetch users and contents
@@ -39,6 +41,23 @@ const AdminPage = () => {
     setFiles([...e.target.files]);
   };
 
+  const uploadFile = useMutation({
+    mutationFn: (formData) => {
+      return axios.post('/api/content/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['content'] });
+      alert('Files uploaded successfully');
+    },
+    onError: () => {
+      alert('Error uploading files');
+    }
+  });
+
   const handleFileUpload = () => {
     if (files.length > 0) {
       const formData = new FormData();
@@ -47,15 +66,7 @@ const AdminPage = () => {
       formData.append('description', description);
       formData.append('audience', audience);
 
-      axios.post('/api/admin/content/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      }).then(res => {
-        alert('Files uploaded successfully');
-      }).catch(err => {
-        alert('Error uploading files');
-      });
+      uploadFile.mutate(formData);
     }
   };
 
@@ -63,24 +74,31 @@ const AdminPage = () => {
     setFiles([...e.target.files]);
   };
 
+  const uploadClarionFile = useMutation({
+    mutationFn: (formData) => {
+      return axios.post('/api/content/clarioncall/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['clarionContent'] });
+      alert('Content posted to Clarion Call successfully');
+      setClarionContent('');
+    },
+    onError: () => {
+      alert('Error posting content to Clarion Call');
+    }
+  });
+
   const handleClarionFileUpload = () => {
     if (files.length > 0) {
       const formData = new FormData();
       files.forEach(file => formData.append('files', file));
       formData.append('clarionContent', clarionContent);
 
-      axios.post('/api/admin/clarioncontent', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      })
-      .then(res => {
-        alert('Content posted to Clarion Call successfully');
-        setClarionContent('');
-      })
-      .catch(err => {
-        alert('Error posting content to Clarion Call');
-      });
+      uploadClarionFile.mutate(formData);
     }
   };
 

@@ -8,12 +8,9 @@ import {
   banUser,
   unbanUser,
   grantPostingRights,
-  updateUser,
-  uploadContent,
-  uploadClarionContent
+  updateUser
 } from '../controllers/admin.controller.js';
 import { authenticate, authorize } from '../middlewares/auth.middleware.js';
-import { uploadMiddleware, uploadToS3 } from '../middlewares/uploadMiddleware.js';
 
 const router = express.Router();
 
@@ -29,12 +26,6 @@ router.post('/content/reject/:id', authenticate, authorize('admin'), rejectConte
 // Manage content (e.g., view, delete, approve, reject)
 router.get('/content', authenticate, authorize('admin'), manageContent);
 
-// Upload content
-router.post('/content/upload', authenticate, authorize('admin'), uploadMiddleware.array('files', 10), uploadToS3, uploadContent);
-
-// Upload Clarion Call content
-router.post('/clarioncontent', authenticate, authorize('admin'), uploadMiddleware.array('files', 10), uploadToS3, uploadClarionContent);
-
 // Manage users (e.g., view, deactivate, or delete)
 router.get('/users', authenticate, authorize('admin'), manageUsers);
 
@@ -49,6 +40,5 @@ router.post('/user/grant', authenticate, authorize('admin'), grantPostingRights)
 
 // Update user details
 router.post('/user/update', authenticate, authorize('admin'), updateUser);
-
 
 export default router;

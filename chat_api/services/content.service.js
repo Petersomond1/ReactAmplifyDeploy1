@@ -37,7 +37,7 @@ export const createContentService = async (contentData, userId) => {
 
 export const addCommentToContentService = async (contentId, commentData, userId) => {
   const { comment_text, comment_video, comment_music, comment_emoji, comment_image } = commentData;
-  const sql = 'INSERT INTO comments (content_id, userId, comment_text, comment_video, comment_music, comment_emoji, comment_image) VALUES (?, ?, ?, ?, ?, ?, ?)';
+  const sql = 'INSERT INTO comments (content_id, userId, comment_text, comment_video, comment_music, comment_emoji, comment_image) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
   const values = [contentId, userId, comment_text, comment_video, comment_music, comment_emoji, comment_image];
   const [result] = await db.execute(sql, values);
   return result.insertId;
